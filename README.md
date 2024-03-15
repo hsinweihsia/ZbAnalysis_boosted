@@ -53,3 +53,4 @@ src: codes
 5. LPC batch farm, condor, is used to run on all samples. Go to SubmitToCondor folder and execute "python launch_v2.py" (submit all samples) or "python launch_v2.py DY_0J_amcatnlo_MC_2016,DY_0J_amcatnlo_MC_2017" (submit DY_0J_amcatnlo_MC_2016 and DY_0J_amcatnlo_MC_2017 samples). NOTE that need to set "runMode = 0" and "submit = True" in launch_v2.py script and define output folders in EOS (outputDir_eos) and local (outputDir_scratch). After jobs finish, execute launch_v2.py again with "runMode = 1" to merge the output files, which are copied to the local directory.
 
   
+# ZbAnalysis_boosted
