@@ -30,6 +30,7 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_evt = new TH1D("Nevt","",4,-1.5,2.5) ; //bin 1: total negative weight events, bin 2: total positive weight events, bin 3: total event weighted by genWeight (= bin2 - bin1, if genWeight are always -1,1
   h_zee_jet = new ZbPlots("Zee_jet") ;
   h_zee_twojet = new ZbPlots("Zee_twojet") ;
+  h_zee_bjet = new ZbPlots("Zee_bjet") ;
   h_zee_bjet_loose = new ZbPlots("Zee_bjet_loose") ;
   h_zee_bjet_medium = new ZbPlots("Zee_bjet_medium") ;
   h_zee_bjet_tight = new ZbPlots("Zee_bjet_tight") ;
@@ -44,6 +45,7 @@ void ZbSelection::SlaveBegin(Reader* r) {
   
   h_zmm_jet = new ZbPlots("Zmm_jet") ;
   h_zmm_twojet = new ZbPlots("Zmm_twojet") ;
+  h_zmm_bjet = new ZbPlots("Zmm_bjet") ;
   h_zmm_bjet_loose = new ZbPlots("Zmm_bjet_loose") ;
   h_zmm_bjet_medium = new ZbPlots("Zmm_bjet_medium") ;
   h_zmm_bjet_tight = new ZbPlots("Zmm_bjet_tight") ;
@@ -120,9 +122,21 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_Zmm_deltaR_ZJet1 = new TH1D("Zmm_deltaR_ZJet1","",10000,-0.5,9.5) ;
 
   
-  h_nbJet_loose = new TH1D ("h_nbJet_loose","",10,-0.5,9.5) ;
   h_nbJet_medium = new TH1D ("h_nbJet_medium","",10,-0.5,9.5) ;
   h_nbJet_tight = new TH1D ("h_nbJet_tight","",10,-0.5,9.5) ;
+  h_Zee_truebJet_pt = new TH1D ("h_Zee_truebJet_pt","",1000,0.,1000.) ;
+  h_Zee_truecJet_pt = new TH1D ("h_Zee_truecJet_pt","",1000,0.,1000.) ;
+  h_Zee_truelightJet_pt = new TH1D ("h_Zee_truelightJet_pt","",1000,0.,1000.) ;
+  h_Zee_nJet_trueFlav = new TH1D("h_Zee_nJet_trueFlav","",10,-0.5,9.5) ;
+  h_Zee_nbJet_loose_tagged = new TH1D("h_Zee_nbJet_loose_tagged","",10,-0.5,9.5) ;
+  h_Zee_bJet_pt_loose_tagged = new TH1D("h_Zee_bJet_pt_loose_tagged","",3000,0.0,3000) ;
+
+  h_Zmm_truebJet_pt = new TH1D ("h_Zmm_truebJet_pt","",1000,0.,1000.) ;
+  h_Zmm_truecJet_pt = new TH1D ("h_Zmm_truecJet_pt","",1000,0.,1000.) ;
+  h_Zmm_truelightJet_pt = new TH1D ("h_Zmm_truelightJet_pt","",1000,0.,1000.) ;
+  h_Zmm_nJet_trueFlav = new TH1D("h_Zmm_nJet_trueFlav","",10,-0.5,9.5) ;
+  h_Zmm_nbJet_loose_tagged = new TH1D("h_Zmm_nbJet_loose_tagged","",10,-0.5,9.5) ;
+  h_Zmm_bJet_pt_loose_tagged = new TH1D("h_Zmm_bJet_pt_loose_tagged","",3000,0.0,3000) ;
 
   //Sumw2
   h_Zee_ZmassFull->Sumw2() ;
@@ -142,7 +156,10 @@ void ZbSelection::SlaveBegin(Reader* r) {
 
   tmp = h_zmm_twojet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
-  
+
+  tmp = h_zee_bjet->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]); 
+
   tmp = h_zee_bjet_loose->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
@@ -153,6 +170,9 @@ void ZbSelection::SlaveBegin(Reader* r) {
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
   tmp = h_zee_bjet_afterMET->returnHisto() ;
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+
+  tmp = h_zmm_bjet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
   tmp = h_zmm_bjet_loose->returnHisto() ;
@@ -268,9 +288,20 @@ void ZbSelection::SlaveBegin(Reader* r) {
   r->GetOutputList()->Add(h_Zee_deltaR_ZJet1) ;
   r->GetOutputList()->Add(h_Zmm_deltaR_ZJet1) ;
   r->GetOutputList()->Add(h_nJet) ;
-  r->GetOutputList()->Add(h_nbJet_loose) ;
-  r->GetOutputList()->Add(h_nbJet_medium) ;
-  r->GetOutputList()->Add(h_nbJet_tight) ;
+  r->GetOutputList()->Add(h_Zee_truebJet_pt) ;
+  r->GetOutputList()->Add(h_Zee_truecJet_pt) ;
+  r->GetOutputList()->Add(h_Zee_truelightJet_pt) ;
+  r->GetOutputList()->Add(h_Zee_nJet_trueFlav) ;
+  r->GetOutputList()->Add(h_Zee_nbJet_loose_tagged) ;
+  r->GetOutputList()->Add(h_Zee_bJet_pt_loose_tagged) ;
+
+  r->GetOutputList()->Add(h_Zmm_truebJet_pt) ;
+  r->GetOutputList()->Add(h_Zmm_truecJet_pt) ;
+  r->GetOutputList()->Add(h_Zmm_truelightJet_pt) ;
+  r->GetOutputList()->Add(h_Zmm_nJet_trueFlav) ;
+  r->GetOutputList()->Add(h_Zmm_nbJet_loose_tagged) ;
+  r->GetOutputList()->Add(h_Zmm_bJet_pt_loose_tagged) ;
+
   
   const Int_t nx = 5, nx1 = 4, yx= 6, nzee=8, nzmm=8;
   const char *ele_cut[nx] = {"all","ip","kine","EB-EE gap","ID"};
@@ -336,7 +367,7 @@ h_evt->Fill(2,genWeight);
   for (unsigned int i = 0 ; i < *(r->nElectron) ; ++i) {
     h_ele_cutflow->Fill(1) ;
     
-    float etaSC = (r->Electron_eta)[i]-(r->Electron_deltaEtaSC[i]) ;
+    float etaSC = (r->Electron_eta)[i]+(r->Electron_deltaEtaSC[i]) ;
     LepObj ele((r->Electron_pt)[i],(r->Electron_eta)[i],etaSC,(r->Electron_phi)[i],(r->Electron_mass)[i],i,(r->Electron_charge)[i],0) ;
 
     float dz = (r->Electron_dz)[i]; 
@@ -419,28 +450,40 @@ h_evt->Fill(2,genWeight);
   std::vector<JetObj> bjets_loose ;
   std::vector<JetObj> bjets_medium ;
   std::vector<JetObj> bjets_tight ;
+  std::vector<JetObj> bjets_true ;
+  std::vector<JetObj> subjets ;
+  std::vector<JetObj> bL_subjets ;
+  std::vector<JetObj> bM_subjets ;
+  std::vector<JetObj> bT_subjets ;
+bool pushed_subjetidx1 = false; 
+bool pushed_bL_subjets = false; 
+bool pushed_bM_subjets = false; 
+bool pushed_bT_subjets = false; 
 
   float btagL_cut = CUTS.Get<float>("jet_PNETL_"+m_year) ;  
   float btagM_cut = CUTS.Get<float>("jet_PNETM_"+m_year) ;
   float btagT_cut = CUTS.Get<float>("jet_PNETT_"+m_year) ;
-  //std::cout << "number of jets =" <<*(r->nFatJet)<<std::endl;
+  //std::cout << "2017 btagL_cut =" <<btagL_cut<<std::endl;
   for (unsigned int i = 0 ; i < *(r->nFatJet) ; ++i) {
-    
+    float m_SD = 0;
+    int subjetIndx1 = 0;
+    subjetIndx1 = (r->FatJet_subJetIdx1)[i];
+    int subjetIndx2 = 0;
+    subjetIndx2 = (r->FatJet_subJetIdx2)[i];
     h_Jet_cutflow->Fill(1) ;
     
     int jetFlav = -1 ;
 #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
     jetFlav = (r->FatJet_hadronFlavour)[i];
 #endif 
-    JetObj jet((r->FatJet_pt)[i],(r->FatJet_eta)[i],(r->FatJet_phi)[i],(r->FatJet_mass)[i],jetFlav,(r->FatJet_particleNetMD_QCD)[i],(r->FatJet_particleNetMD_Xbb)[i],(r->FatJet_tau1)[i],(r->FatJet_tau2)[i],(r->FatJet_tau3)[i],(r->FatJet_tau4)[i]) ;
+    JetObj jet((r->FatJet_pt)[i],(r->FatJet_eta)[i],(r->FatJet_phi)[i],(r->FatJet_mass)[i],jetFlav,(r->FatJet_particleNetMD_QCD)[i],(r->FatJet_particleNetMD_Xbb)[i],(r->FatJet_tau1)[i],(r->FatJet_tau2)[i],(r->FatJet_tau3)[i],(r->FatJet_tau4)[i],(r->FatJet_msoftdrop)[i],subjetIndx1,subjetIndx2) ;
 
-    
 
     float totXbb = (jet.m_particleNetMD_Xbb+jet.m_particleNetMD_QCD);
     float PNet = -1;
     if(totXbb>0) PNet = (jet.m_particleNetMD_Xbb)/(totXbb);
     
-    
+    //std::cout << "FatJet_subJetIdx2 = " <<(r->FatJet_subJetIdx2)[i]<<std::endl;
     //h_Jet_cutflow->Fill(2) ;
 
     if (jet.IsLepton(eles_jetOverlap)) continue ;
@@ -462,12 +505,86 @@ h_evt->Fill(2,genWeight);
     if (PNet >= btagT_cut) bjets_tight.push_back(jet) ;
     if (PNet >= btagM_cut) bjets_medium.push_back(jet) ;
     if (PNet >= btagL_cut) bjets_loose.push_back(jet) ;
+    if (fabs(jet.m_flav) == 5)bjets_true.push_back(jet);
+    if (!pushed_subjetidx1) {
+            int subjetFlav_idx1 = -1 ;
+            int subjetFlav_idx2 = -1 ;
+            #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
+            subjetFlav_idx1 = (r->SubJet_hadronFlavour)[jets[0].m_idx1];
+            subjetFlav_idx2 = (r->SubJet_hadronFlavour)[jets[0].m_idx2];
+            #endif 
+            JetObj subjetidx1((r->SubJet_pt)[jets[0].m_idx1], (r->SubJet_eta)[jets[0].m_idx1], (r->SubJet_phi)[jets[0].m_idx1],
+                              (r->SubJet_mass)[jets[0].m_idx1], subjetFlav_idx1, -1, -1, 
+                              (r->SubJet_tau1)[jets[0].m_idx1], (r->SubJet_tau2)[jets[0].m_idx1], 
+                              (r->SubJet_tau3)[jets[0].m_idx1], (r->SubJet_tau4)[jets[0].m_idx1], -1, -1, -1);
+            JetObj subjetidx2((r->SubJet_pt)[jets[0].m_idx2], (r->SubJet_eta)[jets[0].m_idx2], (r->SubJet_phi)[jets[0].m_idx2],
+                              (r->SubJet_mass)[jets[0].m_idx2], subjetFlav_idx2, -1, -1, 
+                              (r->SubJet_tau1)[jets[0].m_idx2], (r->SubJet_tau2)[jets[0].m_idx2], 
+                              (r->SubJet_tau3)[jets[0].m_idx2], (r->SubJet_tau4)[jets[0].m_idx2], -1, -1, -1);
+            subjets.push_back(subjetidx1);
+            subjets.push_back(subjetidx2);
+            pushed_subjetidx1 = true;
+        }
+ if ((bjets_loose.size()>0)&&!pushed_bL_subjets) {
+            int subjetFlav_idx1 = -1 ;
+            int subjetFlav_idx2 = -1 ;
+            #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
+            subjetFlav_idx1 = (r->SubJet_hadronFlavour)[bjets_loose[0].m_idx1];
+            subjetFlav_idx2 = (r->SubJet_hadronFlavour)[bjets_loose[0].m_idx2];
+            #endif 
+            JetObj bL_subjetidx1((r->SubJet_pt)[bjets_loose[0].m_idx1], (r->SubJet_eta)[bjets_loose[0].m_idx1], (r->SubJet_phi)[bjets_loose[0].m_idx1],
+                              (r->SubJet_mass)[bjets_loose[0].m_idx1], subjetFlav_idx1, -1, -1, 
+                              (r->SubJet_tau1)[bjets_loose[0].m_idx1], (r->SubJet_tau2)[bjets_loose[0].m_idx1], 
+                              (r->SubJet_tau3)[bjets_loose[0].m_idx1], (r->SubJet_tau4)[bjets_loose[0].m_idx1], -1, -1, -1);
+            JetObj bL_subjetidx2((r->SubJet_pt)[bjets_loose[0].m_idx2], (r->SubJet_eta)[bjets_loose[0].m_idx2], (r->SubJet_phi)[bjets_loose[0].m_idx2],
+                              (r->SubJet_mass)[bjets_loose[0].m_idx2], subjetFlav_idx2, -1, -1, 
+                              (r->SubJet_tau1)[bjets_loose[0].m_idx2], (r->SubJet_tau2)[bjets_loose[0].m_idx2], 
+                              (r->SubJet_tau3)[bjets_loose[0].m_idx2], (r->SubJet_tau4)[bjets_loose[0].m_idx2], -1, -1, -1);
+            bL_subjets.push_back(bL_subjetidx1);
+            bL_subjets.push_back(bL_subjetidx2);
+            pushed_bL_subjets = true;
+        }
+ if ((bjets_medium.size()>0)&&(!pushed_bM_subjets)) {
+            int subjetFlav_idx1 = -1 ;
+            int subjetFlav_idx2 = -1 ;
+            #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
+            subjetFlav_idx1 = (r->SubJet_hadronFlavour)[bjets_medium[0].m_idx1];
+            subjetFlav_idx2 = (r->SubJet_hadronFlavour)[bjets_medium[0].m_idx2];
+            #endif 
+            JetObj bM_subjetidx1((r->SubJet_pt)[bjets_medium[0].m_idx1], (r->SubJet_eta)[bjets_medium[0].m_idx1], (r->SubJet_phi)[bjets_medium[0].m_idx1],
+                              (r->SubJet_mass)[bjets_medium[0].m_idx1], subjetFlav_idx1, -1, -1, 
+                              (r->SubJet_tau1)[bjets_medium[0].m_idx1], (r->SubJet_tau2)[bjets_medium[0].m_idx1], 
+                              (r->SubJet_tau3)[bjets_medium[0].m_idx1], (r->SubJet_tau4)[bjets_medium[0].m_idx1], -1, -1, -1);
+            JetObj bM_subjetidx2((r->SubJet_pt)[bjets_medium[0].m_idx2], (r->SubJet_eta)[bjets_medium[0].m_idx2], (r->SubJet_phi)[bjets_medium[0].m_idx2],
+                              (r->SubJet_mass)[bjets_medium[0].m_idx2], subjetFlav_idx2, -1, -1, 
+                              (r->SubJet_tau1)[bjets_medium[0].m_idx2], (r->SubJet_tau2)[bjets_medium[0].m_idx2], 
+                              (r->SubJet_tau3)[bjets_medium[0].m_idx2], (r->SubJet_tau4)[bjets_medium[0].m_idx2], -1, -1, -1);
+            bM_subjets.push_back(bM_subjetidx1);
+            bM_subjets.push_back(bM_subjetidx2);
+            pushed_bM_subjets = true;
+        }
+ if ((bjets_tight.size()>0)&&!pushed_bT_subjets) {
+            int subjetFlav_idx1 = -1 ;
+            int subjetFlav_idx2 = -1 ;
+            #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
+            subjetFlav_idx1 = (r->SubJet_hadronFlavour)[bjets_tight[0].m_idx1];
+            subjetFlav_idx2 = (r->SubJet_hadronFlavour)[bjets_tight[0].m_idx2];
+            #endif 
+            JetObj bT_subjetidx1((r->SubJet_pt)[bjets_tight[0].m_idx1], (r->SubJet_eta)[bjets_tight[0].m_idx1], (r->SubJet_phi)[bjets_tight[0].m_idx1],
+                              (r->SubJet_mass)[bjets_tight[0].m_idx1], subjetFlav_idx1, -1, -1, 
+                              (r->SubJet_tau1)[bjets_tight[0].m_idx1], (r->SubJet_tau2)[bjets_tight[0].m_idx1], 
+                              (r->SubJet_tau3)[bjets_tight[0].m_idx1], (r->SubJet_tau4)[bjets_tight[0].m_idx1], -1, -1, -1);
+            JetObj bT_subjetidx2((r->SubJet_pt)[bjets_tight[0].m_idx2], (r->SubJet_eta)[bjets_tight[0].m_idx2], (r->SubJet_phi)[bjets_tight[0].m_idx2],
+                              (r->SubJet_mass)[bjets_tight[0].m_idx2], subjetFlav_idx2, -1, -1, 
+                              (r->SubJet_tau1)[bjets_tight[0].m_idx2], (r->SubJet_tau2)[bjets_tight[0].m_idx2], 
+                              (r->SubJet_tau3)[bjets_tight[0].m_idx2], (r->SubJet_tau4)[bjets_tight[0].m_idx2], -1, -1, -1);
+            bT_subjets.push_back(bT_subjetidx1);
+            bT_subjets.push_back(bT_subjetidx2);
+            pushed_bT_subjets = true;
+        }
 
   }
-  h_nJet->Fill(jets.size(),evtW) ;
-  h_nbJet_loose->Fill(bjets_loose.size(),evtW) ;
-  h_nbJet_medium->Fill(bjets_medium.size(),evtW) ;
-  h_nbJet_tight->Fill(bjets_tight.size(),evtW) ;
+
 /*for (unsigned int i = 0 ; i < (bjets_loose.size()) ; ++i) {
  std::cout << "QCD =" <<bjets_loose[i].m_particleNetMD_QCD<<std::endl;
 std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
@@ -594,27 +711,42 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
         //at least one jet
         if (jets.size() >= 1) { //1 inclusive jet
         //leading jets should pass kinematic cuts
-        if (jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){          
+           
+        if (jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(jets[0].m_idx1>0)&&(jets[0].m_idx2>0)){          
           h_zee_cutflow->Fill(6) ; //pass jet cuts
           h_zee_cutflow_medium->Fill(6) ; //pass jet cuts
           h_zee_cutflow_tight->Fill(6) ; //pass jet cuts
 
-          h_zee_jet->Fill(Z, jets[0], zee_w) ;
+          h_zee_jet->Fill(Z, jets[0],subjets[0],subjets[1], zee_w) ;
           h_zee_jet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zee_w);
  	  h_zee_jet->FillMet_Sig(*(r->MET_significance), zee_w);
+          
         
           // isolation
           float deltaRelelep0 = Z.m_lep0.m_lvec.DeltaR(jets[0].m_lvec);
           float deltaRelelep1 = Z.m_lep1.m_lvec.DeltaR(jets[0].m_lvec); 
           h_dR_je->Fill(std::min(deltaRelelep0,deltaRelelep1), zee_w) ;
-        
+          
+         h_Zee_nJet_trueFlav->Fill(jets[0].m_flav, zee_w);  
+         if(fabs(jets[0].m_flav)==5){h_Zee_truebJet_pt->Fill(jets[0].m_lvec.Pt(),zee_w);}
+         if(fabs(jets[0].m_flav)==4){h_Zee_truecJet_pt->Fill(jets[0].m_lvec.Pt(),zee_w);}
+         if(fabs(jets[0].m_flav)!=4 and fabs(jets[0].m_flav)!=5){h_Zee_truelightJet_pt->Fill(jets[0].m_lvec.Pt(),zee_w);}
+         float totXbb_leading = (jets[0].m_particleNetMD_Xbb+jets[0].m_particleNetMD_QCD);
+         float PNet_leading = -1;
+         if(totXbb_leading>0) PNet_leading = (jets[0].m_particleNetMD_Xbb)/(totXbb_leading);
+         if (PNet_leading>=btagL_cut){
+         h_Zee_nbJet_loose_tagged->Fill(jets[0].m_flav, zee_w) ;
+         h_Zee_bJet_pt_loose_tagged->Fill(jets[0].m_lvec.Pt(),zee_w);
+         }
 
         } //end at least one jet
+
        }//end leading jet kinematic cuts
+
         //at least two jet
-        if (jets.size() >= 2 && jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")) { //2 inclusive jet
+        if (jets.size() >= 2 && jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(jets[0].m_idx1>0)&&(jets[0].m_idx2>0)) { //2 inclusive jet
           h_Zee_twojet_pt_jet1->Fill(jets[1].m_lvec.Pt(), zee_w) ;
-          h_zee_twojet->Fill(Z, jets[0], zee_w) ;
+          h_zee_twojet->Fill(Z, jets[0], subjets[0],subjets[1],zee_w) ;
           h_zee_twojet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zee_w);
           h_Zee_deltaR_ZJet1->Fill(Z.m_lvec.DeltaR(jets[1].m_lvec), zee_w);
  	  
@@ -628,31 +760,31 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
 
         
         if (bjets_loose.size() >=1 ) {
-           if (bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
+           if (bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_loose[0].m_idx1>0)&&(bjets_loose[0].m_idx2>0)){
           //std::cout<<"bjet after cut = "<< bjets[0].m_lvec.Pt()<<" "<<bjets[0].m_lvec.Eta()<<std::endl<<""<<PNet_T;
           h_zee_cutflow->Fill(7) ;
 
-          h_zee_bjet_loose->Fill(Z, bjets_loose[0], zeeb_w) ;
+          h_zee_bjet_loose->Fill(Z, bjets_loose[0], subjets[0],subjets[1],zeeb_w) ;
           h_zee_bjet_loose->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
  	  h_zee_bjet_loose->FillMet_Sig(*(r->MET_significance), zeeb_w);
         }
       }
         if (bjets_medium.size() >=1 ) {
-           if (bjets_medium[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_medium[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
+           if (bjets_medium[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_medium[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_medium[0].m_idx1>0)&&(bjets_medium[0].m_idx2>0)){
           //std::cout<<"bjet after cut = "<< bjets[0].m_lvec.Pt()<<" "<<bjets[0].m_lvec.Eta()<<std::endl<<""<<PNet_T;
           h_zee_cutflow_medium->Fill(7) ;
 
-          h_zee_bjet_medium->Fill(Z, bjets_medium[0], zeeb_w) ;
+          h_zee_bjet_medium->Fill(Z, bjets_medium[0], bM_subjets[0],bM_subjets[1],zeeb_w) ;
           h_zee_bjet_medium->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
  	  h_zee_bjet_medium->FillMet_Sig(*(r->MET_significance), zeeb_w);
         }
       }
         if (bjets_tight.size() >=1 ) {
-           if (bjets_tight[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_tight[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
+           if (bjets_tight[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_tight[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_tight[0].m_idx1>0)&&(bjets_tight[0].m_idx2>0)){
           //std::cout<<"bjet after cut = "<< bjets[0].m_lvec.Pt()<<" "<<bjets[0].m_lvec.Eta()<<std::endl<<""<<PNet_T;
           h_zee_cutflow_tight->Fill(7) ;
 
-          h_zee_bjet_tight->Fill(Z, bjets_tight[0], zeeb_w) ;
+          h_zee_bjet_tight->Fill(Z, bjets_tight[0],bT_subjets[0],bT_subjets[1], zeeb_w) ;
           h_zee_bjet_tight->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
  	  h_zee_bjet_tight->FillMet_Sig(*(r->MET_significance), zeeb_w);
         }
@@ -677,14 +809,14 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
             
 
 
-            h_zee_2bjet->Fill(Z, bjets_loose[0], bjets_loose[1], evtW) ;
+            h_zee_2bjet->Fill(Z, bjets_loose[0], bjets_loose[1],bL_subjets[0],bL_subjets[1], evtW) ;
             h_zee_2bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
 	    h_zee_2bjet->FillMet_Sig(*(r->MET_significance), evtW);
             h_zee_2bjet->FillNjet(bjets_loose.size(),evtW) ; 
 
 #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
             if (bjets_loose[0].m_flav == 5 && bjets_loose[1].m_flav == 5) {
-              h_zee_2bjet_bb->Fill(Z, bjets_loose[0], bjets_loose[1], evtW) ;
+              h_zee_2bjet_bb->Fill(Z, bjets_loose[0], bjets_loose[1],bL_subjets[0],bL_subjets[1], evtW) ;
               h_zee_2bjet_bb->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
               w_zee_rec_afterMET_uf = zeeb_w;
               zee_rec_afterMET_uf.push_back(eles[0].m_lvec);
@@ -693,11 +825,11 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
               zee_rec_afterMET_uf.push_back(bjets_loose[1].m_lvec);
             }
             else if ((bjets_loose[0].m_flav == 5 && bjets_loose[1].m_flav != 5) || (bjets_loose[0].m_flav != 5 && bjets_loose[1].m_flav == 5)) {
-              h_zee_2bjet_bX->Fill(Z, bjets_loose[0], bjets_loose[1], evtW) ;
+              h_zee_2bjet_bX->Fill(Z, bjets_loose[0], bjets_loose[1],bL_subjets[0],bL_subjets[1], evtW) ;
               h_zee_2bjet_bX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
             }
             else {
-              h_zee_2bjet_XX->Fill(Z, bjets_loose[0], bjets_loose[1], evtW) ;
+              h_zee_2bjet_XX->Fill(Z, bjets_loose[0], bjets_loose[1], bL_subjets[0],bL_subjets[1],evtW) ;
               h_zee_2bjet_XX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
             }
 #endif
@@ -713,7 +845,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
     JetPlot J_cut1(jets_ele_removal[0]);
     h_pt_jet_after_ele_rem->Fill(J_cut1.m_lvec.Pt(), evtW);
   }
-  
+
   
 
   ///////////////////////////
@@ -759,10 +891,10 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
           h_zmm_cutflow->Fill(5) ; //pass jet cuts
           h_zmm_cutflow_medium->Fill(5) ; //pass jet cuts
           h_zmm_cutflow_tight->Fill(5) ; //pass jet cuts
-        h_zmm_jet->FillNjet(jets.size(), evtW) ;
+        h_zmm_jet->FillNjet(jets.size(), zmm_w) ;
         if (jets.size() >= 1) { //1 inclusive jet
         //leading jets should pass kinematic cuts
-        if (jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
+        if (jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(jets[0].m_idx1>0)&&(jets[0].m_idx2>0)){
           h_zmm_cutflow->Fill(6) ; //pass jet cuts
           h_zmm_cutflow_medium->Fill(6) ; //pass jet cuts
           h_zmm_cutflow_tight->Fill(6) ; //pass jet cuts
@@ -770,20 +902,31 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
           float deltaRmuonlep0 = Z.m_lep0.m_lvec.DeltaR(jets[0].m_lvec);
           float deltaRmuonlep1 = Z.m_lep1.m_lvec.DeltaR(jets[0].m_lvec);
         
-          h_zmm_jet->Fill(Z, jets[0], zmm_w) ;
-          h_zmm_jet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
-          h_zmm_jet->FillMet_Sig(*(r->MET_significance), evtW);
+          h_zmm_jet->Fill(Z, jets[0], subjets[0],subjets[1],zmm_w) ;
+          h_zmm_jet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmm_w);
+          h_zmm_jet->FillMet_Sig(*(r->MET_significance), zmm_w);
 
-          h_dR_jm->Fill(std::min(deltaRmuonlep0,deltaRmuonlep1), evtW) ;
+          h_dR_jm->Fill(std::min(deltaRmuonlep0,deltaRmuonlep1), zmm_w) ;
+
+         h_Zmm_nJet_trueFlav->Fill(jets[0].m_flav, zmm_w);  
+         if(fabs(jets[0].m_flav)==5){h_Zmm_truebJet_pt->Fill(jets[0].m_lvec.Pt(),zmm_w);}
+         if(fabs(jets[0].m_flav)==4){h_Zmm_truecJet_pt->Fill(jets[0].m_lvec.Pt(),zmm_w);}
+         if(fabs(jets[0].m_flav)!=4 and fabs(jets[0].m_flav)!=5){h_Zmm_truelightJet_pt->Fill(jets[0].m_lvec.Pt(),zmm_w);}
+         float totXbb_leading = (jets[0].m_particleNetMD_Xbb+jets[0].m_particleNetMD_QCD);
+         float PNet_leading = -1;
+         if(totXbb_leading>0) PNet_leading = (jets[0].m_particleNetMD_Xbb)/(totXbb_leading);
+         if (PNet_leading>=btagL_cut){
+         h_Zmm_nbJet_loose_tagged->Fill(jets[0].m_flav, zmm_w) ;
+         h_Zmm_bJet_pt_loose_tagged->Fill(jets[0].m_lvec.Pt(),zmm_w);}
          }//end leading jet kinematic cuts
         } //end at least one jet
 
-        if (jets.size() >= 2 && jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")) { //2 inclusive jet
+        if (jets.size() >= 2 && jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(jets[0].m_idx1>0)&&(jets[0].m_idx2>0)) { //2 inclusive jet
 
-          h_Zmm_twojet_pt_jet1->Fill(jets[1].m_lvec.Pt(), evtW) ;
-          h_zmm_twojet->Fill(Z, jets[0], evtW) ;
-          h_zmm_twojet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
-          h_Zmm_deltaR_ZJet1->Fill(Z.m_lvec.DeltaR(jets[1].m_lvec), evtW);
+          h_Zmm_twojet_pt_jet1->Fill(jets[1].m_lvec.Pt(),zmm_w) ;
+          h_zmm_twojet->Fill(Z, jets[0], subjets[0],subjets[1],zmm_w) ;
+          h_zmm_twojet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmm_w);
+          h_Zmm_deltaR_ZJet1->Fill(Z.m_lvec.DeltaR(jets[1].m_lvec), zmm_w);
         } //end at least two jet
         
         //Zmm+bjets
@@ -793,28 +936,28 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
         if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zmm_bjet_afterMET->FillNjet(bjets_loose.size(),zmmb_w) ; 
         
         if (bjets_loose.size() >= 1) {
-          if (bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
+          if (bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_loose[0].m_idx1>0)&&(bjets_loose[0].m_idx2>0)){
           h_zmm_cutflow->Fill(7) ;
           
-          h_zmm_bjet_loose->Fill(Z, bjets_loose[0], zmmb_w) ; 
+          h_zmm_bjet_loose->Fill(Z, bjets_loose[0], bL_subjets[0],bL_subjets[1],zmmb_w) ; 
           h_zmm_bjet_loose->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
           h_zmm_bjet_loose->FillMet_Sig(*(r->MET_significance), zmmb_w);
          }
         }
         if (bjets_medium.size() >= 1) {
-          if (bjets_medium[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_medium[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
+          if (bjets_medium[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_medium[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_medium[0].m_idx1>0)&&(bjets_medium[0].m_idx2>0)){
           h_zmm_cutflow_medium->Fill(7) ;
           
-          h_zmm_bjet_medium->Fill(Z, bjets_loose[0], zmmb_w) ; 
+          h_zmm_bjet_medium->Fill(Z, bjets_medium[0], bM_subjets[0],bM_subjets[1],zmmb_w) ; 
           h_zmm_bjet_medium->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
           h_zmm_bjet_medium->FillMet_Sig(*(r->MET_significance), zmmb_w);
          }
         }
         if (bjets_tight.size() >= 1) {
-          if (bjets_tight[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_tight[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
-          h_zmm_cutflow_medium->Fill(7) ;
+          if (bjets_tight[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_tight[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_tight[0].m_idx1>0)&&(bjets_tight[0].m_idx2>0)){
+          h_zmm_cutflow_tight->Fill(7) ;
           
-          h_zmm_bjet_tight->Fill(Z, bjets_tight[0], zmmb_w) ; 
+          h_zmm_bjet_tight->Fill(Z, bjets_tight[0], bT_subjets[0],bT_subjets[1],zmmb_w) ; 
           h_zmm_bjet_tight->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
           h_zmm_bjet_tight->FillMet_Sig(*(r->MET_significance), zmmb_w);
          }
@@ -840,7 +983,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
             
             
             h_zmm_2bjet->FillNjet(bjets_loose.size(),evtW) ; 
-            h_zmm_2bjet->Fill(Z, bjets_loose[0], bjets_loose[1], evtW) ; 
+            h_zmm_2bjet->Fill(Z, bjets_loose[0], bjets_loose[1],bL_subjets[0],bL_subjets[1], evtW) ; 
             h_zmm_2bjet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
 
             h_zmm_2bjet->FillMet_Sig(*(r->MET_significance), evtW);
@@ -848,7 +991,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
 
 #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
             if (bjets_loose[0].m_flav == 5 && bjets_loose[1].m_flav == 5) {
-              h_zmm_2bjet_bb->Fill(Z, bjets_loose[0], bjets_loose[1], evtW) ;
+              h_zmm_2bjet_bb->Fill(Z, bjets_loose[0], bjets_loose[1], bL_subjets[0],bL_subjets[1],evtW) ;
               h_zmm_2bjet_bb->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
               w_zmm_rec_afterMET_uf = zmmb_w;
               zmm_rec_afterMET_uf.push_back(muons[0].m_lvec);
@@ -857,11 +1000,11 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
               zmm_rec_afterMET_uf.push_back(bjets_loose[1].m_lvec);
             }
             else if ((bjets_loose[0].m_flav == 5 && bjets_loose[1].m_flav != 5) || (bjets_loose[0].m_flav != 5 && bjets_loose[1].m_flav == 5)) {
-              h_zmm_2bjet_bX->Fill(Z, bjets_loose[0], bjets_loose[1], evtW) ;
+              h_zmm_2bjet_bX->Fill(Z, bjets_loose[0], bjets_loose[1], bL_subjets[0],bL_subjets[1],evtW) ;
               h_zmm_2bjet_bX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
             }
             else {
-              h_zmm_2bjet_XX->Fill(Z, bjets_loose[0], bjets_loose[1], evtW) ;
+              h_zmm_2bjet_XX->Fill(Z, bjets_loose[0], bjets_loose[1], bL_subjets[0],bL_subjets[1],evtW) ;
               h_zmm_2bjet_XX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
             }
 
@@ -874,6 +1017,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
     } //end two muons
   } //end trigger
 
+ 
   //Fill additional unfolding plots
 
   return;

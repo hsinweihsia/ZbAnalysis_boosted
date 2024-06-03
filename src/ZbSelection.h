@@ -45,10 +45,12 @@ private:
   ZbPlots* h_zee_bjet_loose ;
   ZbPlots* h_zee_bjet_medium ;
   ZbPlots* h_zee_bjet_tight ;
+  ZbPlots* h_zee_bjet ;
   ZbPlots* h_zee_bjet_afterMET ;
   ZbPlots* h_zmm_bjet_loose ;
   ZbPlots* h_zmm_bjet_medium ;
   ZbPlots* h_zmm_bjet_tight ;
+  ZbPlots* h_zmm_bjet ;
   ZbPlots* h_zmm_bjet_afterMET ;
   Z2bPlots* h_zee_2bjet ;
   Z2bPlots* h_zee_2bjet_bb ;
@@ -131,7 +133,19 @@ private:
   TH1D* h_nbJet_loose ;  
   TH1D* h_nbJet_medium ;  
   TH1D* h_nbJet_tight ;  
+  TH1D* h_Zee_truebJet_pt ;  
+  TH1D* h_Zee_truecJet_pt ; 
+  TH1D* h_Zee_truelightJet_pt ;   
+  TH1D* h_Zee_nJet_trueFlav ;  
+  TH1D* h_Zee_nbJet_loose_tagged ;  
+  TH1D* h_Zee_bJet_pt_loose_tagged ;  
 
+  TH1D* h_Zmm_truebJet_pt ;  
+  TH1D* h_Zmm_truecJet_pt ; 
+  TH1D* h_Zmm_truelightJet_pt ;   
+  TH1D* h_Zmm_nJet_trueFlav ;  
+  TH1D* h_Zmm_nbJet_loose_tagged ;  
+  TH1D* h_Zmm_bJet_pt_loose_tagged ;  
   
 
 } ;
