@@ -161,6 +161,19 @@ public :
    TTreeReaderArray<Int_t> FatJet_electronIdx3SJ = {fReader, "FatJet_electronIdx3SJ"};
    TTreeReaderArray<Int_t> FatJet_muonIdx3SJ = {fReader, "FatJet_muonIdx3SJ"};
    
+   //subjet
+   TTreeReaderValue<UInt_t> nSubJet = {fReader, "nSubJet"};
+   TTreeReaderArray<Float_t> SubJet_eta = {fReader, "SubJet_eta"};
+   TTreeReaderArray<Float_t> SubJet_mass = {fReader, "SubJet_mass"};
+   TTreeReaderArray<Float_t> SubJet_n2b1 = {fReader, "SubJet_n2b1"};
+   TTreeReaderArray<Float_t> SubJet_n3b1 = {fReader, "SubJet_n3b1"};
+   TTreeReaderArray<Float_t> SubJet_phi = {fReader, "SubJet_phi"};
+   TTreeReaderArray<Float_t> SubJet_pt = {fReader, "SubJet_pt"};
+   TTreeReaderArray<Float_t> SubJet_rawFactor = {fReader, "SubJet_rawFactor"};
+   TTreeReaderArray<Float_t> SubJet_tau1 = {fReader, "SubJet_tau1"};
+   TTreeReaderArray<Float_t> SubJet_tau2 = {fReader, "SubJet_tau2"};
+   TTreeReaderArray<Float_t> SubJet_tau3 = {fReader, "SubJet_tau3"};
+   TTreeReaderArray<Float_t> SubJet_tau4 = {fReader, "SubJet_tau4"};
 
    //MET 
    TTreeReaderValue<Float_t> MET_pt = {fReader, "MET_pt"};
@@ -196,6 +209,7 @@ public :
    TTreeReaderValue<Float_t> Pileup_nTrueInt = {fReader, "Pileup_nTrueInt"};
    TTreeReaderValue<Float_t> genWeight = {fReader, "genWeight"};
    TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader, "Jet_hadronFlavour"};
+   TTreeReaderArray<Int_t> SubJet_hadronFlavour = {fReader, "SubJet_hadronFlavour"};
 #endif
 
 
