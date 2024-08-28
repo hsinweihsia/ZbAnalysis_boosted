@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string.hpp>
 
 #include "StdArg.hpp"
 #include "src/Reader.h" 
@@ -31,7 +31,7 @@ std::vector<std::string> splitNames(const std::string& files, std::string sep = 
   return fileList;
 
 }
-
+/*
 void SetParameters(std::string fName, glob::Parameters& para) {
   std::string line;
   std::ifstream myfile (fName);
@@ -61,6 +61,53 @@ void SetParameters(std::string fName, glob::Parameters& para) {
       //  std::cout << " " << cont_no_space[i] ;
       //}
       //std::cout << std::endl ;
+
+      if (cont_no_space.size() != 3) {
+        std::cout << "\n Need name, value, value type. Will skip this \"" << line << "\"" << std::endl ;
+      }
+      else {
+        std::string name = cont_no_space[0] ;
+        if (cont_no_space[2] == "int") para.Set(name, std::stoi(cont[1])) ;
+        if (cont_no_space[2] == "float") para.Set(name, std::stof(cont_no_space[1])) ;
+        if (cont_no_space[2] == "string") para.SetStr(name, cont_no_space[1]) ;
+      }
+    }
+
+    myfile.close();
+  }
+  
+  else cout << "Unable to open file"; 
+
+}*/
+void SetParameters(std::string fName, glob::Parameters& para) {
+  std::string line;
+  std::ifstream myfile (fName);
+  if (myfile.is_open())
+  {
+    while ( getline (myfile,line) )
+    {
+      
+      //skip comment line start with "//"
+      if (line.find("//") != std::string::npos) continue ;
+      
+      std::vector<std::string> cont ;
+      std::vector<std::string> cont_no_space ;
+      //std::string delim(" ") ;
+      
+      //boost::split(cont, line, boost::is_any_of(delim));
+      std::stringstream ss(line);
+      std::string token;
+      char delimiter = ' ';
+      while (getline(ss, token, delimiter)) {
+        cont.push_back(token);
+      }
+      
+      for (size_t i = 0 ; i < cont.size() ; ++i) {
+        //std::cout << "\n" << cont[i] << cont[i].find(" ") << " " << std::string::npos;
+        if (cont[i].find_first_not_of(' ') != std::string::npos) {
+          cont_no_space.push_back(cont[i]) ;
+        }
+      }
 
       if (cont_no_space.size() != 3) {
         std::cout << "\n Need name, value, value type. Will skip this \"" << line << "\"" << std::endl ;
@@ -180,13 +227,15 @@ int main(int argc, char *argv[]) {
   ZbSelection sel ;
   
   
-  std::string fName_btagSF;
+  //std::string fName_btagSF;
   std::string fName_PUjetID_SF;
   std::string fName_PUjetID_eff;
   std::vector<std::string> fName_eleTrig ;
-  std::string fName_eleRecSF;
-  std::string fName_eleIDSF;
+  std::vector<std::string> fName_eleRecSF;
+  std::vector<std::string> fName_eleIDSF;
   std::vector<float> lw_eleTrig; 
+  std::vector<float> lw_eleRecSF; 
+  std::vector<float> lw_eleIDSF; 
   std::vector<std::string> fName_muonTrig ;
   std::vector<std::string> fName_muonID ;
   std::vector<std::string> fName_muonIso ;
@@ -224,13 +273,15 @@ int main(int argc, char *argv[]) {
 #endif
 
 #if defined(MC_preVFP2016) 
-  fName_btagSF = "CalibData/DeepCSV_2016LegacySF_WP_V1.csv" ;//FIXME move to PNET
+  //fName_btagSF = "CalibData/DeepCSV_2016LegacySF_WP_V1.csv" ;//FIXME move to PNET
   //ele trig SF: https://twiki.cern.ch/twiki/bin/view/CMS/EgHLTScaleFactorMeasurements
   fName_eleTrig.push_back("CalibData/egammaTrigEffi_wp90noiso_preVFP_EGM2D_2016.root");
   //ele reco SF: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaUL2016To2018
-  fName_eleRecSF = "CalibData/egammaEffi_ptAbove20.txt_EGM2D_UL2016preVFP.root";
+  fName_eleRecSF.push_back("CalibData/egammaEffi_ptAbove20.txt_EGM2D_UL2016preVFP.root");
+  lw_eleRecSF.push_back(1.0);
   //ele ID SF: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaUL2016To2018
-  fName_eleIDSF = "CalibData/egammaEffi.txt_Ele_Tight_preVFP_EGM2D.root" ;
+  fName_eleIDSF.push_back("CalibData/egammaEffi.txt_Ele_Tight_preVFP_EGM2D.root");
+  lw_eleIDSF.push_back(1.0);
   lw_eleTrig.push_back(1.0);
   //Muon:https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonUL2016#Medium_pT_from_15_to_120_GeV
   fName_muonTrig.push_back("CalibData/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_SingleMuonTriggers.root");
@@ -245,13 +296,15 @@ int main(int argc, char *argv[]) {
   fName_puSF = "CalibData/2016_pileup_ratio.root";//FIXME
 #endif
 #if defined(MC_postVFP2016) 
-  fName_btagSF = "CalibData/DeepCSV_2016LegacySF_WP_V1.csv" ;//FIXME move to PNET
+  //fName_btagSF = "CalibData/DeepCSV_2016LegacySF_WP_V1.csv" ;//FIXME move to PNET
   //ele trig SF: https://twiki.cern.ch/twiki/bin/view/CMS/EgHLTScaleFactorMeasurements
   fName_eleTrig.push_back("CalibData/egammaTrigEffi_wp90noiso_postVFP_EGM2D_2016.root");
   //ele reco SF: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaUL2016To2018
-  fName_eleRecSF = "CalibData/egammaEffi_ptAbove20.txt_EGM2D_UL2016postVFP.root";
+  fName_eleRecSF.push_back("CalibData/egammaEffi_ptAbove20.txt_EGM2D_UL2016postVFP.root");
+  lw_eleRecSF.push_back(1.0);
   //ele ID SF: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaUL2016To2018
-  fName_eleIDSF = "CalibData/egammaEffi.txt_Ele_Tight_postVFP_EGM2D.root" ;
+  fName_eleIDSF.push_back("CalibData/egammaEffi.txt_Ele_Tight_postVFP_EGM2D.root");
+  lw_eleIDSF.push_back(1.0);
   lw_eleTrig.push_back(1.0);
   fName_muonTrig.push_back("CalibData/Efficiencies_muon_generalTracks_Z_Run2016_UL_SingleMuonTriggers.root");
   lw_muonTrig.push_back(1.0);
@@ -266,10 +319,12 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef MC_2017
-  fName_btagSF = "CalibData/DeepCSV_94XSF_WP_V4_B_F.csv";//FIXME
+  //fName_btagSF = "CalibData/DeepCSV_94XSF_WP_V4_B_F.csv";//FIXME
   fName_eleTrig.push_back("CalibData/egammaTrigEffi_wp90noiso_EGM2D_2017.root");
-  fName_eleRecSF = "CalibData/egammaEffi_ptAbove20.txt_EGM2D_UL2017.root";
-  fName_eleIDSF = "CalibData/egammaEffi.txt_EGM2D_Tight_UL17.root";
+  fName_eleRecSF.push_back("CalibData/egammaEffi_ptAbove20.txt_EGM2D_UL2017.root");
+  lw_eleRecSF.push_back(1.0);
+  fName_eleIDSF.push_back("CalibData/egammaEffi.txt_EGM2D_Tight_UL17.root");
+  lw_eleIDSF.push_back(1.0);
   lw_eleTrig.push_back(1.0);
   fName_muonTrig.push_back("CalibData/Efficiencies_muon_generalTracks_Z_Run2017_UL_SingleMuonTriggers.root");
   lw_muonTrig.push_back(1.);
@@ -284,10 +339,12 @@ int main(int argc, char *argv[]) {
   fName_puSF = "CalibData/2017_pileup_ratio.root";
 #endif
 #ifdef MC_2018
-  fName_btagSF = "CalibData/DeepCSV_102XSF_WP_V1.csv";//FIXME
+  //fName_btagSF = "CalibData/DeepCSV_102XSF_WP_V1.csv";//FIXME
   fName_eleTrig.push_back("CalibData/egammaTrigEffi_wp90noiso_EGM2D_2018.root");
-  fName_eleRecSF = "CalibData/egammaEffi_ptAbove20.txt_EGM2D_UL2018.root";
-  fName_eleIDSF = "CalibData/egammaEffi.txt_Ele_Tight_EGM2D.root";
+  fName_eleRecSF.push_back("CalibData/egammaEffi_ptAbove20.txt_EGM2D_UL2018.root");
+  lw_eleRecSF.push_back(1.0);
+  fName_eleIDSF.push_back("CalibData/egammaEffi.txt_Ele_Tight_EGM2D.root");
+  lw_eleIDSF.push_back(1.0);
   lw_eleTrig.push_back(1.0);
   fName_muonTrig.push_back("CalibData/Efficiencies_muon_generalTracks_Z_Run2018_UL_SingleMuonTriggers.root");
   lw_muonTrig.push_back(1.0);
@@ -303,11 +360,11 @@ int main(int argc, char *argv[]) {
   fName_PUjetID_SF = "CalibData/scalefactorsPUID_81Xtraining.root";
   fName_PUjetID_eff = "CalibData/effcyPUID_81Xtraining.root";
   sel.SetRandom() ; //used for muon rochestor correction (used when correcting for MC)
-  if (CUTS.GetStr("jet_main_btagWP")=="deepCSVT") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effT.root");
-  if (CUTS.GetStr("jet_main_btagWP")=="deepJetT") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effT.root");
-  if (CUTS.GetStr("jet_main_btagWP")=="deepCSVM") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effM.root");
-  if (CUTS.GetStr("jet_main_btagWP")=="deepJetM") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effM.root");
-  sel.SetEleEffCorr(fName_eleTrig,fName_eleRecSF,fName_eleIDSF,lw_eleTrig);
+  //if (CUTS.GetStr("jet_main_btagWP")=="deepCSVT") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effT.root");
+  //if (CUTS.GetStr("jet_main_btagWP")=="deepJetT") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effT.root");
+  //if (CUTS.GetStr("jet_main_btagWP")=="deepCSVM") sel.SetBtagCalib(fName_btagSF,"DeepCSV","CalibData/effM.root");
+  //if (CUTS.GetStr("jet_main_btagWP")=="deepJetM") sel.SetBtagCalib(fName_btagSF,"DeepJet","CalibData/effM.root");
+  sel.SetEleEffCorr(fName_eleTrig,fName_eleRecSF,fName_eleIDSF,lw_eleTrig,lw_eleRecSF,lw_eleIDSF);
   sel.SetMuonEffCorr(fName_muonTrig,fName_muonID,fName_muonIso,fName_muonReco,lw_muonTrig,lw_muonID,lw_muonIso,lw_muonReco);
   sel.SetPileupSF(fName_puSF);
   sel.SetPUjetidCalib(fName_PUjetID_SF,fName_PUjetID_eff); //pileup jet ID SF
@@ -323,6 +380,16 @@ int main(int argc, char *argv[]) {
   for (std::vector<Selector*>::iterator it = sels.begin() ; it != sels.end() ; it++) ana.addSelector(*it) ;
   
   chain.Process(&ana,"",intlastentry,intfirstentry) ;
+  /*for (std::vector<Selector*>::iterator it = sels.begin() ; it != sels.end() ; it++) ana.addSelector(*it) ;
+  std::cout << "\n Selections added" << std::endl; 
+  try {
+    chain.Process(&ana,"",intlastentry,intfirstentry) ;
+    std::cout << "\n End processing" << std::endl;
+    chain.Reset(); //Close file now to prevent crash on TNetX...
+  }
+  catch (const std::exception& e) {
+    std::cout << "Exception " << e.what() << endl;
+  }*/
   
   return 0 ;
 }
