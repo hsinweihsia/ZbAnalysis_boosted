@@ -17,7 +17,7 @@ void Selector::SetLumiMaskFilter(std::string fName_lumiMaskFilter) {
   m_lumiFilter.Set(fName_lumiMaskFilter) ;
 }
 
-void Selector::SetBtagCalib(std::string csvFileName, std::string taggerName, std::string effFileName) {
+/*void Selector::SetBtagCalib(std::string csvFileName, std::string taggerName, std::string effFileName) {
   m_btagCal = BTagCalibration(taggerName, csvFileName) ;
   m_btagReader = BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
                                        "central",            //central sys type
@@ -35,8 +35,8 @@ void Selector::SetBtagCalib(std::string csvFileName, std::string taggerName, std
   
   m_btagEffFile = new TFile(effFileName.c_str(),"READ") ;
 
-}
-
+}*/
+/*
 void Selector::SetEleEffCorr(std::vector<std::string> fName_trig,std::string fName_recSF, std::string fName_IDSF, std::vector<float> w_trig) {
   std::string trigN("EGamma_SF2D");
   TFile* fRec = new TFile(fName_recSF.c_str(),"READ") ;
@@ -50,6 +50,34 @@ void Selector::SetEleEffCorr(std::vector<std::string> fName_trig,std::string fNa
   }
 
   for(float w : w_trig) m_eleTrig_w.push_back(w) ;
+}
+*/
+
+void Selector::SetEleEffCorr(std::vector<std::string> fName_trig, std::vector<std::string> fName_recSF, std::vector<std::string> fName_IDSF, std::vector<float> w_trig,std::vector<float> w_SFrec,std::vector<float> w_IDSF) {
+  std::string trigN("EGamma_SF2D");
+  std::string idN("EGamma_SF2D");
+  std::string RecoN("EGamma_SF2D");
+
+  for(std::string fN : fName_trig) {
+    TFile* f = new TFile(fN.c_str(),"READ");
+    m_hSF_eleTrig.push_back((TH2F*)f->Get(trigN.c_str()));
+    m_hSF_eleTrig.back()->SetDirectory(0);
+  }
+  for(std::string fN : fName_IDSF) {
+    TFile* f = new TFile(fN.c_str(),"READ");
+    m_hSF_eleID.push_back((TH2F*)f->Get(idN.c_str()));
+    m_hSF_eleID.back()->SetDirectory(0);
+  }
+
+  for(std::string fN : fName_recSF) {
+    TFile* f = new TFile(fN.c_str(),"READ");
+    m_hSF_eleReco.push_back((TH2F*)f->Get(RecoN.c_str()));
+    m_hSF_eleReco.back()->SetDirectory(0);
+  }
+
+  for(float w : w_trig) m_eleTrig_w.push_back(w) ;
+  for(float w : w_SFrec) m_eleReco_w.push_back(w) ;
+  for(float w : w_IDSF) m_eleID_w.push_back(w) ;
 }
 
 //multiple inputs to deal with different SFs for different run periods 
@@ -101,6 +129,78 @@ void Selector::SetMuonEffCorr(std::vector<std::string> fName_trig, std::vector<s
   for(float w : w_ID) m_muonID_w.push_back(w) ;
   for(float w : w_reco) m_muonReco_w.push_back(w) ;
 }
+
+
+/*void Selector::SetMuonEffCorr(std::vector<std::string> fName_trig,
+                              std::vector<std::string> fName_ID,
+                              std::vector<std::string> fName_iso,
+                              std::vector<std::string> fName_reco,
+                              std::vector<float> w_trig,
+                              std::vector<float> w_ID,
+                              std::vector<float> w_iso,
+                              std::vector<float> w_reco) {
+    // Define base histogram names
+    const std::string trigN_base = "NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdMedium_and_PFIsoMedium_abseta_pt";
+    const std::string idN_base = "NUM_MediumID_DEN_TrackerMuons_abseta_pt_syst";
+    const std::string isoN_base = "NUM_TightRelIso_DEN_MediumID_abseta_pt_syst";
+    const std::string RecoN_base = "NUM_TrackerMuons_DEN_genTracks";
+
+    std::string trigN, idN, isoN, RecoN;
+
+    // Determine the correct histogram names based on conditions
+        trigN = trigN_base;
+        idN = idN_base;
+        isoN = isoN_base;
+        RecoN = RecoN_base;
+#if defined(MC_postVFP2016)
+        trigN = trigN_base;
+        idN = idN_base;
+        isoN = isoN_base;
+        RecoN = RecoN_base;
+#endif
+#if defined(MC_2017) 
+        trigN = "NUM_IsoMu27_DEN_CutBasedIdMedium_and_PFIsoMedium_abseta_pt";
+        idN = idN_base;
+        isoN = isoN_base;
+        RecoN = RecoN_base;
+#endif
+#if defined(MC_2018)  
+        trigN = "NUM_IsoMu24_DEN_CutBasedIdMedium_and_PFIsoMedium_abseta_pt";
+        idN = idN_base;
+        isoN = isoN_base;
+        RecoN = RecoN_base;
+#endif
+    // Lambda function to load histograms from a file and add to the appropriate vector
+    auto loadHistograms = [&](const std::vector<std::string>& fileNames, std::vector<TH2F*>& targetVector, const std::string& histName) {
+        for (const auto& fName : fileNames) {
+            TFile file(fName.c_str(), "READ");
+            if (file.IsZombie()) {
+                std::cerr << "Error opening file: " << fName << std::endl;
+                continue;
+            }
+            TH2F* hist = static_cast<TH2F*>(file.Get(histName.c_str()));
+            if (!hist) {
+                std::cerr << "Histogram not found in file: " << fName << std::endl;
+                continue;
+            }
+            hist->SetDirectory(0);
+            targetVector.push_back(hist);
+        }
+    };
+
+    // Load histograms for muon efficiency corrections
+    loadHistograms(fName_trig, m_hSF_muonTrig, trigN);
+    loadHistograms(fName_ID, m_hSF_muonID, idN);
+    loadHistograms(fName_iso, m_hSF_muonIso, isoN);
+    loadHistograms(fName_reco, m_hSF_muonReco, RecoN);
+
+    // Store weights directly
+    m_muonTrig_w = std::move(w_trig);
+    m_muonID_w = std::move(w_ID);
+    m_muonIso_w = std::move(w_iso);
+    m_muonReco_w = std::move(w_reco);
+}
+*/
 
 void Selector::SetPileupSF(std::string fName_puSF) {
   TFile* f = new TFile(fName_puSF.c_str(),"READ") ;
@@ -169,7 +269,7 @@ float Selector::PUjetWeight(std::vector<JetObj>& jets){
    return weight ;
 }*/
 
-float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string jet_main_btagWP, std::string uncType) {
+/*float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string jet_main_btagWP, std::string uncType) {
   //get calibration file
   std::string bN = "b_pt_eff_"+m_year;
   std::string cN = "c_pt_eff_"+m_year;
@@ -219,7 +319,7 @@ float Selector::CalBtagWeight(std::vector<JetObj>& jets, std::string jet_main_bt
   float sf(1.) ;
   if (pMC > 0) sf = pData/pMC ;
   return sf ;
-}
+}*/
 
 //Get scale factors from a list of calibration histograms h (each histo corresponds to a run periods, for example muon in 2016 has scale factors for B->F and G->H sets. w are weights for each sets 
 std::vector<float> Selector::GetSF_2DHist(float x, float y, std::vector<TH2F*> h, std::vector<float> w) {
@@ -242,7 +342,7 @@ std::vector<float> Selector::GetSF_2DHist(float x, float y, std::vector<TH2F*> h
   o[1] = e_sf ;
   return o ;
 }
-
+/*
 float Selector::CalEleSF(LepObj e1, LepObj e2) {
   std::vector<TH2F*> h{m_hSF_eleRec};
   std::vector<float> w{1.0};
@@ -252,6 +352,16 @@ float Selector::CalEleSF(LepObj e1, LepObj e2) {
   sf *= GetSF_2DHist(e1.m_lvec.Eta(),e1.m_lvec.Pt(),h,w)[0] ; 
   sf *= GetSF_2DHist(e2.m_lvec.Eta(),e2.m_lvec.Pt(),h,w)[0] ; 
   return sf ; 
+}*/
+
+float Selector::CalEleSF(LepObj e1, LepObj e2) {
+  float sf = 1.0;
+  sf *= GetSF_2DHist(e1.m_lvec.Eta(), e1.m_lvec.Pt(), m_hSF_eleID, m_eleID_w)[0];
+  sf *= GetSF_2DHist(e2.m_lvec.Eta(), e2.m_lvec.Pt(), m_hSF_eleID, m_eleID_w)[0];
+  sf *= GetSF_2DHist(e1.m_lvec.Eta(), e1.m_lvec.Pt(), m_hSF_eleReco, m_eleReco_w)[0];
+  sf *= GetSF_2DHist(e2.m_lvec.Eta(), e2.m_lvec.Pt(), m_hSF_eleReco, m_eleReco_w)[0];
+
+  return sf;
 }
 
 float Selector::CalMuonSF_id_iso(LepObj e1, LepObj e2) {
