@@ -158,7 +158,8 @@ class ZbPlots
 
       h_met_sig = new TH1D(name + "_met_sig","",1000,0,1000);
       h_met_sig->Sumw2();
-
+        
+      h_mSD = new TH1D(name + "_mSD","",300,0.,300.) ;
       h_particleNetMD_QCD = new TH1D(name + "_particleNetMD_QCD","",4000,-20.0,20.0) ;
       h_particleNetMD_Xbb = new TH1D(name + "_particleNetMD_Xbb","",4000,-20.0,20.0) ;
       h_particleNetMD_XbbvsQCD = new TH1D(name + "_particleNetMD_XbbvsQCD","",4000,-20.0,20.0) ;
@@ -174,6 +175,7 @@ class ZbPlots
       h_tau2_jet->Sumw2();
       h_tau3_jet->Sumw2();
       h_tau4_jet->Sumw2();
+      h_mSD->Sumw2();
 
       h_pt_sub0 = new TH1D(name + "_pt_sub0","",NBIN_PT_Z,X_PT_Z[0],X_PT_Z[1]) ;
       h_phi_sub0 = new TH1D(name + "_phi_sub0","",400,-4.0,4.0) ;
@@ -184,7 +186,9 @@ class ZbPlots
       h_tau2_sub0 = new TH1D(name + "_tau2_sub0","",100,0.0,1.0) ;
       h_tau3_sub0 = new TH1D(name + "_tau3_sub0","",100,0.0,1.0) ;
       h_tau4_sub0 = new TH1D(name + "_tau4_sub0","",100,0.0,1.0) ;
-
+      h_n2b1_sub0 = new TH1D(name + "_n2b1_sub0","",1000,0.0,10.0) ;
+      h_n3b1_sub0 = new TH1D(name + "_n3b1_sub0","",1000,0.0,10.0) ;
+       
       h_pt_sub1 = new TH1D(name + "_pt_sub1","",NBIN_PT_Z,X_PT_Z[0],X_PT_Z[1]) ;
       h_phi_sub1 = new TH1D(name + "_phi_sub1","",400,-4.0,4.0) ;
       h_eta_sub1 = new TH1D(name + "_eta_sub1","",300,-3.0,3.0) ;
@@ -194,8 +198,19 @@ class ZbPlots
       h_tau2_sub1 = new TH1D(name + "_tau2_sub1","",100,0.0,1.0) ;
       h_tau3_sub1 = new TH1D(name + "_tau3_sub1","",100,0.0,1.0) ;
       h_tau4_sub1 = new TH1D(name + "_tau4_sub1","",100,0.0,1.0) ;
-        
+      h_n2b1_sub1 = new TH1D(name + "_n2b1_sub1","",1000,0.0,10.0) ;
+      h_n3b1_sub1 = new TH1D(name + "_n3b1_sub1","",1000,0.0,10.0) ;        
+
+      
+      h_deltaPhi_subjets = new TH1D(name + "_deltaPhi_subjets","",400,-4.0,4.0) ;
+      h_deltaEta_subjets = new TH1D(name + "_deltaEta_subjets","",300,-3.0,3.0) ;
       h_deltaR_subjets = new TH1D(name + "_deltaR_subjets","",10000,-0.5,9.5) ;
+      h_deltaR_subjets_mSD = new TH2D(name + "_deltaR_subjets_mSD","",10000,-0.5,9.5,300,0.,300.) ;
+      h_deltaR_subjets_InvM = new TH2D(name + "_deltaR_subjets_InvM","",10000,-0.5,9.5,1000,0,1000.) ;
+      h_subjet_InvM = new TH1D(name + "_subjet_InvM","",1000,0,1000) ;
+      h_subjet_minPt_sumPt = new TH1D(name + "_subjet_minPt_sumPt","",1000,0,10) ;  
+      h_subjet_minPt_sumPt_deltaR = new TH2D(name + "_subjet_minPt_sumPt_deltaR","",1000,0,10,10000,-0.5,9.5) ;  
+      h_jetMass_n2b1 = new TH2D(name + "_jetMass_n2b1","",50,0.,0.5,200,0.,200.) ;
 
       h_pt_sub0->Sumw2();
       h_phi_sub0->Sumw2();
@@ -206,6 +221,8 @@ class ZbPlots
       h_tau2_sub0->Sumw2();
       h_tau3_sub0->Sumw2();
       h_tau4_sub0->Sumw2();
+      h_n2b1_sub0->Sumw2();
+      h_n3b1_sub0->Sumw2();
 
       h_pt_sub1->Sumw2();
       h_phi_sub1->Sumw2();
@@ -216,8 +233,18 @@ class ZbPlots
       h_tau2_sub1->Sumw2();
       h_tau3_sub1->Sumw2();
       h_tau4_sub1->Sumw2();
+      h_n2b1_sub1->Sumw2();
+      h_n3b1_sub1->Sumw2();
     
+      h_deltaPhi_subjets->Sumw2();  
+      h_deltaEta_subjets->Sumw2();  
       h_deltaR_subjets->Sumw2();
+      h_deltaR_subjets_mSD->Sumw2();
+      h_deltaR_subjets_InvM->Sumw2();
+      h_subjet_InvM->Sumw2();
+      h_subjet_minPt_sumPt->Sumw2();
+      h_jetMass_n2b1->Sumw2();
+      h_subjet_minPt_sumPt_deltaR->Sumw2();
         
     
     } ;
@@ -263,6 +290,7 @@ class ZbPlots
           h_tau2_jet->Fill(J.m_tau2, w) ;
           h_tau3_jet->Fill(J.m_tau3, w) ;
           h_tau4_jet->Fill(J.m_tau4, w) ;
+        h_mSD->Fill(J.m_mSD, w) ;
         
       h_pt_sub0->Fill(SubJ1.m_lvec.Pt(), w) ;
       h_phi_sub0->Fill(SubJ1.m_lvec.Eta(), w) ;
@@ -273,6 +301,8 @@ class ZbPlots
       h_tau2_sub0->Fill(SubJ1.m_tau2, w) ;
       h_tau3_sub0->Fill(SubJ1.m_tau3, w) ;
       h_tau4_sub0->Fill(SubJ1.m_tau4, w) ;
+      h_n2b1_sub0->Fill(SubJ1.m_n2b1, w) ;
+      h_n3b1_sub0->Fill(SubJ1.m_n3b1, w) ;
      
       h_pt_sub1->Fill(SubJ2.m_lvec.Pt(), w) ;
       h_phi_sub1->Fill(SubJ2.m_lvec.Eta(), w) ;
@@ -283,9 +313,22 @@ class ZbPlots
       h_tau2_sub1->Fill(SubJ2.m_tau2, w) ;
       h_tau3_sub1->Fill(SubJ2.m_tau3, w) ;
       h_tau4_sub1->Fill(SubJ2.m_tau4, w) ;
-        
+      h_n2b1_sub1->Fill(SubJ2.m_n2b1, w) ;
+      h_n3b1_sub1->Fill(SubJ2.m_n3b1, w) ;
+       
+      h_deltaPhi_subjets->Fill(DphiC(Dphi(SubJ1.m_lvec.Phi(), SubJ2.m_lvec.Phi())), w);
+      h_deltaEta_subjets->Fill(Deta(SubJ1.m_lvec.Eta(), SubJ2.m_lvec.Eta()), w);
       h_deltaR_subjets->Fill(SubJ1.m_lvec.DeltaR(SubJ2.m_lvec), w) ;
-
+      h_deltaR_subjets_mSD->Fill(SubJ1.m_lvec.DeltaR(SubJ2.m_lvec),J.m_mSD,w);
+      h_deltaR_subjets_InvM->Fill(SubJ1.m_lvec.DeltaR(SubJ2.m_lvec),(SubJ1.m_lvec+SubJ2.m_lvec).M(),w);
+      h_subjet_InvM->Fill((SubJ1.m_lvec+SubJ2.m_lvec).M(),w);
+      float pT1 = SubJ1.m_lvec.Pt() ;
+      float pT2 = SubJ2.m_lvec.Pt() ;
+      float pTmin = (pT1 < pT2) ? pT1 : pT2 ;
+      h_subjet_minPt_sumPt->Fill((pTmin/(pT1+pT2),w));
+      h_jetMass_n2b1->Fill(J.m_n2b1,J.m_lvec.M(),w);
+      h_subjet_minPt_sumPt_deltaR->Fill((pTmin/(pT1+pT2)),SubJ1.m_lvec.DeltaR(SubJ2.m_lvec), w);
+        
     } ;
 
     void FillNjet(size_t nJet, float w) {
@@ -342,6 +385,7 @@ class ZbPlots
       histolist.push_back(h_tau2_jet) ;
       histolist.push_back(h_tau3_jet) ;
       histolist.push_back(h_tau4_jet) ;
+      histolist.push_back(h_mSD) ;
 
       histolist.push_back(h_pt_sub0) ;
       histolist.push_back(h_phi_sub0) ;
@@ -352,6 +396,8 @@ class ZbPlots
       histolist.push_back(h_tau2_sub0) ;
       histolist.push_back(h_tau3_sub0) ;
       histolist.push_back(h_tau4_sub0) ;
+      histolist.push_back(h_n2b1_sub0) ;
+      histolist.push_back(h_n3b1_sub0) ;
       histolist.push_back(h_pt_sub1) ;
       histolist.push_back(h_phi_sub1) ;
       histolist.push_back(h_eta_sub1) ;
@@ -361,8 +407,17 @@ class ZbPlots
       histolist.push_back(h_tau2_sub1) ;
       histolist.push_back(h_tau3_sub1) ;
       histolist.push_back(h_tau4_sub1) ;
+      histolist.push_back(h_n2b1_sub1) ;
+      histolist.push_back(h_n3b1_sub1) ;
+      histolist.push_back(h_deltaPhi_subjets) ;
+      histolist.push_back(h_deltaEta_subjets) ;
       histolist.push_back(h_deltaR_subjets) ;
-
+      histolist.push_back(h_deltaR_subjets_InvM) ;
+      histolist.push_back(h_deltaR_subjets_mSD) ;
+      histolist.push_back(h_subjet_InvM) ;
+      histolist.push_back(h_subjet_minPt_sumPt) ;
+      histolist.push_back(h_jetMass_n2b1) ;
+      histolist.push_back(h_subjet_minPt_sumPt_deltaR);
 
       return histolist ; 
     }
@@ -408,7 +463,7 @@ class ZbPlots
     TH1D* h_tau2_jet ;
     TH1D* h_tau3_jet ;
     TH1D* h_tau4_jet ;
-    
+    TH1D* h_mSD;
     
     TH1D* h_pt_sub0 ;
     TH1D* h_eta_sub0 ;
@@ -419,6 +474,8 @@ class ZbPlots
     TH1D* h_tau2_sub0 ;
     TH1D* h_tau3_sub0 ;
     TH1D* h_tau4_sub0 ;
+    TH1D* h_n2b1_sub0 ;
+    TH1D* h_n3b1_sub0 ;
     TH1D* h_pt_sub1 ;
     TH1D* h_eta_sub1 ;
     TH1D* h_phi_sub1 ;
@@ -428,7 +485,17 @@ class ZbPlots
     TH1D* h_tau2_sub1 ;
     TH1D* h_tau3_sub1 ;
     TH1D* h_tau4_sub1 ;
+    TH1D* h_n2b1_sub1 ;
+    TH1D* h_n3b1_sub1 ;
+    TH1D* h_deltaPhi_subjets;
+    TH1D* h_deltaEta_subjets;
     TH1D* h_deltaR_subjets ;
+    TH2D* h_deltaR_subjets_mSD;
+    TH2D* h_deltaR_subjets_InvM;
+    TH1D* h_subjet_InvM;
+    TH1D* h_subjet_minPt_sumPt;
+    TH2D* h_jetMass_n2b1;
+    TH2D* h_subjet_minPt_sumPt_deltaR;
     
 } ;
 
@@ -499,9 +566,9 @@ class Z2bPlots : public ZbPlots{
       h_dRmax_Z2b->Fill(dRmax, w) ;
       h_A_Z2b->Fill(A_Z2b, w) ;
     } ;
-/*
+
 // Gen plots: modified by Hsin-Wei
-void Fill(TLorentzVector l1, TLorentzVector l2, TLorentzVector b1, TLorentzVector b2, float w) {
+/*void Fill(TLorentzVector l1, TLorentzVector l2, TLorentzVector b1, TLorentzVector b2, float w) {
       TLorentzVector Z = l1 + l2 ;
       TLorentzVector Z2b = Z + b1 +b2;
       float dR = Z.DeltaR(b1) ;
@@ -561,7 +628,7 @@ void Fill(TLorentzVector l1, TLorentzVector l2, TLorentzVector b1, TLorentzVecto
       h_A_Z2b->Fill(A_Z2b, w) ;
 	
    }*/
-    void FillMet(float met, float met_puppi, float w) { 
+   void FillMet(float met, float met_puppi, float w) { 
       h_met->Fill(met,w);
       h_met_puppi->Fill(met_puppi,w);
     };
@@ -670,8 +737,8 @@ class UnfoldingPlots
      //float xBins_dR_rec_bb[nBins_dR_rec_bb] = {0.4,1.0,1.6,2,2.4,2.8,3,3.2,3.4,3.6,4.0,4.4,5,6};
      //unsigned nBins_dR_gen_bb(14);
      //float xBins_dR_gen_bb[nBins_dR_gen_bb] = {0.4,1.2,2.0,2.4,2.8,3.2,3.4,3.6,4.4,5,6};
-/*
-     h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
+
+ /*    h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_all_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
      h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_GenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
      h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_noGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b));
      h_pt_b1_rec.push_back(new TH1D("pt_b1_rec_UFOFGenMatch_" + name, "", nBins_pt_rec_b, xBins_pt_rec_b)); //rec match with underflow or overflow gen
