@@ -27,37 +27,37 @@ ZbSelection::~ZbSelection() {
 } 
 
 void ZbSelection::SlaveBegin(Reader* r) {
-  h_evt = new TH1D("Nevt","",4,-1.5,2.5) ; //bin 1: total negative weight events, bin 2: total positive weight events, bin 3: total event weighted by genWeight (= bin2 - bin1, if genWeight are always -1,1
+ h_evt = new TH1D("Nevt","",4,-1.5,2.5) ; //bin 1: total negative weight events, bin 2: total positive weight events, bin 3: total event weighted by genWeight (= bin2 - bin1, if genWeight are always -1,1
   h_zee_jet = new ZbPlots("Zee_jet") ;
-  h_zee_twojet = new ZbPlots("Zee_twojet") ;
-  h_zee_bjet = new ZbPlots("Zee_bjet") ;
+  //h_zee_twojet = new ZbPlots("Zee_twojet") ;
+  //h_zee_bjet = new ZbPlots("Zee_bjet") ;
   h_zee_bjet_loose = new ZbPlots("Zee_bjet_loose") ;
-  h_zee_bjet_medium = new ZbPlots("Zee_bjet_medium") ;
-  h_zee_bjet_tight = new ZbPlots("Zee_bjet_tight") ;
-  h_zee_bjet_afterMET = new ZbPlots("Zee_bjet_afterMET") ;
+  //h_zee_bjet_medium = new ZbPlots("Zee_bjet_medium") ;
+  //h_zee_bjet_tight = new ZbPlots("Zee_bjet_tight") ;
+  //h_zee_bjet_afterMET = new ZbPlots("Zee_bjet_afterMET") ;
   h_zee_2bjet = new Z2bPlots("Zee_2bjet") ;
 
-  h_zee_2bjet_bb = new Z2bPlots("Zee_2bjet_bb") ; //two tagged bjets are bb
-  h_zee_2bjet_bX = new Z2bPlots("Zee_2bjet_bX") ; //two tagged bjets are bb
-  h_zee_2bjet_XX = new Z2bPlots("Zee_2bjet_XX") ; //two tagged bjets are bb
-  h_zee_bjet_deepJet = new ZbPlots("Zee_bjetDeepJet") ;
-  h_zee_2bjet_deepJet = new Z2bPlots("Zee_2bjetDeepJet") ;
+  //h_zee_2bjet_bb = new Z2bPlots("Zee_2bjet_bb") ; //two tagged bjets are bb
+  //h_zee_2bjet_bX = new Z2bPlots("Zee_2bjet_bX") ; //two tagged bjets are bb
+  //h_zee_2bjet_XX = new Z2bPlots("Zee_2bjet_XX") ; //two tagged bjets are bb
+  //h_zee_bjet_deepJet = new ZbPlots("Zee_bjetDeepJet") ;
+  //h_zee_2bjet_deepJet = new Z2bPlots("Zee_2bjetDeepJet") ;
   
   h_zmm_jet = new ZbPlots("Zmm_jet") ;
-  h_zmm_twojet = new ZbPlots("Zmm_twojet") ;
-  h_zmm_bjet = new ZbPlots("Zmm_bjet") ;
+  //h_zmm_twojet = new ZbPlots("Zmm_twojet") ;
+  //h_zmm_bjet = new ZbPlots("Zmm_bjet") ;
   h_zmm_bjet_loose = new ZbPlots("Zmm_bjet_loose") ;
-  h_zmm_bjet_medium = new ZbPlots("Zmm_bjet_medium") ;
-  h_zmm_bjet_tight = new ZbPlots("Zmm_bjet_tight") ;
-  h_zmm_bjet_afterMET = new ZbPlots("Zmm_bjet_afterMET") ;
+  //h_zmm_bjet_medium = new ZbPlots("Zmm_bjet_medium") ;
+  //h_zmm_bjet_tight = new ZbPlots("Zmm_bjet_tight") ;
+  //h_zmm_bjet_afterMET = new ZbPlots("Zmm_bjet_afterMET") ;
   h_zmm_2bjet = new Z2bPlots("Zmm_2bjet") ;
-  h_zmm_2bjet_bb = new Z2bPlots("Zmm_2bjet_bb") ; //two tagged bjets are bb
-  h_zmm_2bjet_bX = new Z2bPlots("Zmm_2bjet_bX") ; //two tagged bjets are bb
-  h_zmm_2bjet_XX = new Z2bPlots("Zmm_2bjet_XX") ; //two tagged bjets are bb
-  h_zmm_bjet_deepJet = new ZbPlots("Zmm_bjetDeepJet") ;
-  h_zmm_2bjet_deepJet = new Z2bPlots("Zmm_2bjetDeepJet") ;
+  //h_zmm_2bjet_bb = new Z2bPlots("Zmm_2bjet_bb") ; //two tagged bjets are bb
+  //h_zmm_2bjet_bX = new Z2bPlots("Zmm_2bjet_bX") ; //two tagged bjets are bb
+  //h_zmm_2bjet_XX = new Z2bPlots("Zmm_2bjet_XX") ; //two tagged bjets are bb
+  //h_zmm_bjet_deepJet = new ZbPlots("Zmm_bjetDeepJet") ;
+  //h_zmm_2bjet_deepJet = new Z2bPlots("Zmm_2bjetDeepJet") ;
   
-  unsigned nBins = 9 ;
+  /*unsigned nBins = 9 ;
   float bins[10] = {20, 30, 50, 70, 100, 140, 200, 300, 600, 1000} ;
   h_eff_b = new EffPlots("b", nBins, bins) ;
   h_eff_c = new EffPlots("c", nBins, bins) ;
@@ -71,7 +71,7 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_zmm_unfolding = new UnfoldingPlots("zmm");
   
   h_zee_afterMET_unfolding = new UnfoldingPlots("zee_afterMET");
-  h_zmm_afterMET_unfolding = new UnfoldingPlots("zmm_afterMET");
+  h_zmm_afterMET_unfolding = new UnfoldingPlots("zmm_afterMET");*/
 
   h_dR_je = new TH1D("h_dR_je","",500,0,5) ;
   h_dR_jm = new TH1D("h_dR_jm","",500,0,5) ;
@@ -137,9 +137,15 @@ void ZbSelection::SlaveBegin(Reader* r) {
   h_Zmm_nJet_trueFlav = new TH1D("h_Zmm_nJet_trueFlav","",10,-0.5,9.5) ;
   h_Zmm_nbJet_loose_tagged = new TH1D("h_Zmm_nbJet_loose_tagged","",10,-0.5,9.5) ;
   h_Zmm_bJet_pt_loose_tagged = new TH1D("h_Zmm_bJet_pt_loose_tagged","",3000,0.0,3000) ;
+  
+  h_fatjet_mass_n2b1 = new TH2D("h_fatjet_mass_n2b1","",25,0,0.5,20,0,200) ;
+  h_fatjet_mass_mSD = new TH2D("h_fatjet_mass_mSD","",30,0,300,30,0,300) ;
+  h_fatjet_pT_mSD = new TH2D("h_fatjet_pT_mSD","",100,0,1000,30,0,300) ;
+  h_dR_fatjet_lepton  = new TH1D ("h_dR_fatjet_lepton","",1000,0.,10.) ;
+  h_subjets_minpT_sumpT_deltaR_nocut = new TH2D("h_subjets_minpT_sumpT_deltaR_nocut","",1000,0,10,10000,-0.5,9.5) ;
 
   //Sumw2
-  h_Zee_ZmassFull->Sumw2() ;
+ h_Zee_ZmassFull->Sumw2() ;
   h_Zmm_ZmassFull->Sumw2() ;
 
   //Add histograms to fOutput so they can be saved in Processor::SlaveTerminate
@@ -151,79 +157,79 @@ void ZbSelection::SlaveBegin(Reader* r) {
   tmp = h_zmm_jet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zee_twojet->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_twojet->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zmm_twojet->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_twojet->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zee_bjet->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]); 
+  //tmp = h_zee_bjet->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]); 
 
   tmp = h_zee_bjet_loose->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zee_bjet_medium->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_bjet_medium->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_zee_bjet_tight->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_bjet_tight->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zee_bjet_afterMET->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_bjet_afterMET->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zmm_bjet->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_bjet->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
   tmp = h_zmm_bjet_loose->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zmm_bjet_medium->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_bjet_medium->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zmm_bjet_tight->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_bjet_tight->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_zmm_bjet_afterMET->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_bjet_afterMET->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
   tmp = h_zee_2bjet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_zee_2bjet_bb->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_2bjet_bb->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_zee_2bjet_bX->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_2bjet_bX->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zee_2bjet_XX->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_2bjet_XX->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
   tmp = h_zmm_2bjet->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zmm_2bjet_bb->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_2bjet_bb->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_zmm_2bjet_bX->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_2bjet_bX->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zmm_2bjet_XX->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_2bjet_XX->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_zee_bjet_deepJet->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_bjet_deepJet->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_zmm_bjet_deepJet->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_bjet_deepJet->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
 
-  tmp = h_zee_2bjet_deepJet->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zee_2bjet_deepJet->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_zmm_2bjet_deepJet->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  //tmp = h_zmm_2bjet_deepJet->returnHisto() ;
+  //for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   
-  tmp = h_eff_b->returnHisto() ;
+ /* tmp = h_eff_b->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   tmp = h_eff_c->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
@@ -234,17 +240,17 @@ void ZbSelection::SlaveBegin(Reader* r) {
   tmp = h_eff_cdj->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   tmp = h_eff_ldj->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);*/
 
   //Unfolding plots 
-  tmp = h_zee_unfolding->returnHisto() ;
+ /* tmp = h_zee_unfolding->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   tmp = h_zmm_unfolding->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   tmp = h_zee_afterMET_unfolding->returnHisto() ;
   for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
   tmp = h_zmm_afterMET_unfolding->returnHisto() ;
-  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);
+  for(size_t i=0;i<tmp.size();i++) r->GetOutputList()->Add(tmp[i]);*/
 
 
   r->GetOutputList()->Add(h_dR_je) ;
@@ -301,7 +307,11 @@ void ZbSelection::SlaveBegin(Reader* r) {
   r->GetOutputList()->Add(h_Zmm_nJet_trueFlav) ;
   r->GetOutputList()->Add(h_Zmm_nbJet_loose_tagged) ;
   r->GetOutputList()->Add(h_Zmm_bJet_pt_loose_tagged) ;
-
+  r->GetOutputList()->Add(h_fatjet_mass_n2b1) ;
+  r->GetOutputList()->Add(h_fatjet_mass_mSD) ;
+  r->GetOutputList()->Add(h_fatjet_pT_mSD) ;
+  r->GetOutputList()->Add(h_dR_fatjet_lepton) ;
+  r->GetOutputList()->Add(h_subjets_minpT_sumpT_deltaR_nocut) ;
   
   const Int_t nx = 5, nx1 = 4, yx= 6, nzee=8, nzmm=8;
   const char *ele_cut[nx] = {"all","ip","kine","EB-EE gap","ID"};
@@ -352,7 +362,7 @@ h_evt->Fill(2,genWeight);
 #if defined(DATA_preVFP2016) || defined(DATA_postVFP2016) || defined(DATA_2017) || defined(DATA_2018)
   h_evt->Fill(-1) ;
   if (!m_lumiFilter.Pass(*(r->run),*(r->luminosityBlock))) return;
-  h_evt->Fill(1) ;
+  //h_evt->Fill(1) ;
 #endif
 
   float evtW = 1. ;
@@ -364,6 +374,7 @@ h_evt->Fill(2,genWeight);
   //electrons
   std::vector<LepObj> eles ;
   std::vector<LepObj> eles_jetOverlap ;
+  
   for (unsigned int i = 0 ; i < *(r->nElectron) ; ++i) {
     h_ele_cutflow->Fill(1) ;
     
@@ -398,19 +409,23 @@ h_evt->Fill(2,genWeight);
   }
   
   //muons
+  
   std::vector<LepObj> muons ;
   std::vector<LepObj> muons_jetOverlap ;
+  std::vector<LepObj> muons_test ;
   for (unsigned int i = 0 ; i < *(r->nMuon) ; ++i) {
 
     h_muon_cutflow->Fill(1) ;
     
     LepObj muon((r->Muon_pt)[i],(r->Muon_eta)[i],-1,(r->Muon_phi)[i],(r->Muon_mass)[i],i,(r->Muon_charge)[i],(r->Muon_pfRelIso04_all)[i]) ;
+    muons_test.push_back(muon);
     float sf_rc = MuonRcSF(r, muon, 13) ;
     //TEMP
     //sf_rc = 1.0;
     //std::cout << "\n Before correction: " <<  sf_rc << " " << muon.m_lvec.Pt() ;
     //muon.m_lvec.Print() ;
     muon.m_lvec.SetPtEtaPhiM(muon.m_lvec.Pt()*sf_rc,muon.m_lvec.Eta(),muon.m_lvec.Phi(),muon.m_lvec.M()) ;
+
     //std::cout << "\n After " << muon.m_lvec.Pt() ;
     //muon.m_lvec.Print() ;
     
@@ -448,17 +463,19 @@ h_evt->Fill(2,genWeight);
   std::vector<JetObj> jets ;
   std::vector<JetObj> jets_ele_removal ;
   std::vector<JetObj> bjets_loose ;
-  std::vector<JetObj> bjets_medium ;
-  std::vector<JetObj> bjets_tight ;
+  //std::vector<JetObj> bjets_medium ;
+  //std::vector<JetObj> bjets_tight ;
   std::vector<JetObj> bjets_true ;
   std::vector<JetObj> subjets ;
   std::vector<JetObj> bL_subjets ;
   std::vector<JetObj> bM_subjets ;
   std::vector<JetObj> bT_subjets ;
+
 bool pushed_subjetidx1 = false; 
 bool pushed_bL_subjets = false; 
 bool pushed_bM_subjets = false; 
 bool pushed_bT_subjets = false; 
+  std::vector<JetObj> Fatjet_plot ;
 
   float btagL_cut = CUTS.Get<float>("jet_PNETL_"+m_year) ;  
   float btagM_cut = CUTS.Get<float>("jet_PNETM_"+m_year) ;
@@ -466,18 +483,14 @@ bool pushed_bT_subjets = false;
   //std::cout << "2017 btagL_cut =" <<btagL_cut<<std::endl;
   for (unsigned int i = 0 ; i < *(r->nFatJet) ; ++i) {
     float m_SD = 0;
-    int subjetIndx1 = 0;
-    subjetIndx1 = (r->FatJet_subJetIdx1)[i];
-    int subjetIndx2 = 0;
-    subjetIndx2 = (r->FatJet_subJetIdx2)[i];
     h_Jet_cutflow->Fill(1) ;
-    
     int jetFlav = -1 ;
 #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
     jetFlav = (r->FatJet_hadronFlavour)[i];
 #endif 
-    JetObj jet((r->FatJet_pt)[i],(r->FatJet_eta)[i],(r->FatJet_phi)[i],(r->FatJet_mass)[i],jetFlav,(r->FatJet_particleNetMD_QCD)[i],(r->FatJet_particleNetMD_Xbb)[i],(r->FatJet_tau1)[i],(r->FatJet_tau2)[i],(r->FatJet_tau3)[i],(r->FatJet_tau4)[i],(r->FatJet_msoftdrop)[i],subjetIndx1,subjetIndx2) ;
-
+    JetObj jet((r->FatJet_pt)[i],(r->FatJet_eta)[i],(r->FatJet_phi)[i],(r->FatJet_mass)[i],jetFlav,(r->FatJet_particleNetMD_QCD)[i],(r->FatJet_particleNetMD_Xbb)[i],(r->FatJet_tau1)[i],(r->FatJet_tau2)[i],(r->FatJet_tau3)[i],(r->FatJet_tau4)[i],(r->FatJet_msoftdrop)[i],(r->FatJet_subJetIdx1)[i],(r->FatJet_subJetIdx2)[i],(r->FatJet_n2b1)[i],(r->FatJet_n3b1)[i]) ;
+    Fatjet_plot.push_back(jet);
+    
 
     float totXbb = (jet.m_particleNetMD_Xbb+jet.m_particleNetMD_QCD);
     float PNet = -1;
@@ -499,11 +512,13 @@ bool pushed_bT_subjets = false;
     //if (jet.m_lvec.Pt()<40 && jet.m_lvec.Pt()>30 && jet.m_puid<0.86 ) continue;    
     //if (jet.m_lvec.Pt()<50 && jet.m_lvec.Pt()>40 && jet.m_puid<0.93 ) continue;
     //h_Jet_cutflow->Fill(6) ;
+     if (jet.m_idx1 < 0 || jet.m_idx2 <0) continue ;
+     h_Jet_cutflow->Fill(5) ;
 	  
     jets.push_back(jet) ;
 
-    if (PNet >= btagT_cut) bjets_tight.push_back(jet) ;
-    if (PNet >= btagM_cut) bjets_medium.push_back(jet) ;
+    //if (PNet >= btagT_cut) bjets_tight.push_back(jet) ;
+    //if (PNet >= btagM_cut) bjets_medium.push_back(jet) ;
     if (PNet >= btagL_cut) bjets_loose.push_back(jet) ;
     if (fabs(jet.m_flav) == 5)bjets_true.push_back(jet);
     if (!pushed_subjetidx1) {
@@ -516,11 +531,11 @@ bool pushed_bT_subjets = false;
             JetObj subjetidx1((r->SubJet_pt)[jets[0].m_idx1], (r->SubJet_eta)[jets[0].m_idx1], (r->SubJet_phi)[jets[0].m_idx1],
                               (r->SubJet_mass)[jets[0].m_idx1], subjetFlav_idx1, -1, -1, 
                               (r->SubJet_tau1)[jets[0].m_idx1], (r->SubJet_tau2)[jets[0].m_idx1], 
-                              (r->SubJet_tau3)[jets[0].m_idx1], (r->SubJet_tau4)[jets[0].m_idx1], -1, -1, -1);
+                              (r->SubJet_tau3)[jets[0].m_idx1], (r->SubJet_tau4)[jets[0].m_idx1], -1, -1, -1,(r->SubJet_n2b1)[jets[0].m_idx1], (r->SubJet_n3b1)[jets[0].m_idx1]);
             JetObj subjetidx2((r->SubJet_pt)[jets[0].m_idx2], (r->SubJet_eta)[jets[0].m_idx2], (r->SubJet_phi)[jets[0].m_idx2],
                               (r->SubJet_mass)[jets[0].m_idx2], subjetFlav_idx2, -1, -1, 
                               (r->SubJet_tau1)[jets[0].m_idx2], (r->SubJet_tau2)[jets[0].m_idx2], 
-                              (r->SubJet_tau3)[jets[0].m_idx2], (r->SubJet_tau4)[jets[0].m_idx2], -1, -1, -1);
+                              (r->SubJet_tau3)[jets[0].m_idx2], (r->SubJet_tau4)[jets[0].m_idx2], -1, -1, -1,(r->SubJet_n2b1)[jets[0].m_idx2], (r->SubJet_n3b1)[jets[0].m_idx2]);
             subjets.push_back(subjetidx1);
             subjets.push_back(subjetidx2);
             pushed_subjetidx1 = true;
@@ -535,16 +550,16 @@ bool pushed_bT_subjets = false;
             JetObj bL_subjetidx1((r->SubJet_pt)[bjets_loose[0].m_idx1], (r->SubJet_eta)[bjets_loose[0].m_idx1], (r->SubJet_phi)[bjets_loose[0].m_idx1],
                               (r->SubJet_mass)[bjets_loose[0].m_idx1], subjetFlav_idx1, -1, -1, 
                               (r->SubJet_tau1)[bjets_loose[0].m_idx1], (r->SubJet_tau2)[bjets_loose[0].m_idx1], 
-                              (r->SubJet_tau3)[bjets_loose[0].m_idx1], (r->SubJet_tau4)[bjets_loose[0].m_idx1], -1, -1, -1);
+                              (r->SubJet_tau3)[bjets_loose[0].m_idx1], (r->SubJet_tau4)[bjets_loose[0].m_idx1], -1, -1, -1,(r->SubJet_n2b1)[bjets_loose[0].m_idx1], (r->SubJet_n3b1)[bjets_loose[0].m_idx1]);
             JetObj bL_subjetidx2((r->SubJet_pt)[bjets_loose[0].m_idx2], (r->SubJet_eta)[bjets_loose[0].m_idx2], (r->SubJet_phi)[bjets_loose[0].m_idx2],
                               (r->SubJet_mass)[bjets_loose[0].m_idx2], subjetFlav_idx2, -1, -1, 
                               (r->SubJet_tau1)[bjets_loose[0].m_idx2], (r->SubJet_tau2)[bjets_loose[0].m_idx2], 
-                              (r->SubJet_tau3)[bjets_loose[0].m_idx2], (r->SubJet_tau4)[bjets_loose[0].m_idx2], -1, -1, -1);
+                              (r->SubJet_tau3)[bjets_loose[0].m_idx2], (r->SubJet_tau4)[bjets_loose[0].m_idx2], -1, -1, -1,(r->SubJet_n2b1)[bjets_loose[0].m_idx2], (r->SubJet_n3b1)[bjets_loose[0].m_idx2]);
             bL_subjets.push_back(bL_subjetidx1);
             bL_subjets.push_back(bL_subjetidx2);
             pushed_bL_subjets = true;
         }
- if ((bjets_medium.size()>0)&&(!pushed_bM_subjets)) {
+/* if ((bjets_medium.size()>0)&&(!pushed_bM_subjets)) {
             int subjetFlav_idx1 = -1 ;
             int subjetFlav_idx2 = -1 ;
             #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
@@ -554,16 +569,16 @@ bool pushed_bT_subjets = false;
             JetObj bM_subjetidx1((r->SubJet_pt)[bjets_medium[0].m_idx1], (r->SubJet_eta)[bjets_medium[0].m_idx1], (r->SubJet_phi)[bjets_medium[0].m_idx1],
                               (r->SubJet_mass)[bjets_medium[0].m_idx1], subjetFlav_idx1, -1, -1, 
                               (r->SubJet_tau1)[bjets_medium[0].m_idx1], (r->SubJet_tau2)[bjets_medium[0].m_idx1], 
-                              (r->SubJet_tau3)[bjets_medium[0].m_idx1], (r->SubJet_tau4)[bjets_medium[0].m_idx1], -1, -1, -1);
+                              (r->SubJet_tau3)[bjets_medium[0].m_idx1], (r->SubJet_tau4)[bjets_medium[0].m_idx1], -1, -1, -1,(r->SubJet_n2b1)[bjets_medium[0].m_idx1], (r->SubJet_n3b1)[bjets_medium[0].m_idx1]);
             JetObj bM_subjetidx2((r->SubJet_pt)[bjets_medium[0].m_idx2], (r->SubJet_eta)[bjets_medium[0].m_idx2], (r->SubJet_phi)[bjets_medium[0].m_idx2],
                               (r->SubJet_mass)[bjets_medium[0].m_idx2], subjetFlav_idx2, -1, -1, 
                               (r->SubJet_tau1)[bjets_medium[0].m_idx2], (r->SubJet_tau2)[bjets_medium[0].m_idx2], 
-                              (r->SubJet_tau3)[bjets_medium[0].m_idx2], (r->SubJet_tau4)[bjets_medium[0].m_idx2], -1, -1, -1);
+                              (r->SubJet_tau3)[bjets_medium[0].m_idx2], (r->SubJet_tau4)[bjets_medium[0].m_idx2], -1, -1, -1,(r->SubJet_n2b1)[bjets_medium[0].m_idx2], (r->SubJet_n3b1)[bjets_medium[0].m_idx1]);
             bM_subjets.push_back(bM_subjetidx1);
             bM_subjets.push_back(bM_subjetidx2);
             pushed_bM_subjets = true;
-        }
- if ((bjets_tight.size()>0)&&!pushed_bT_subjets) {
+        }*/
+/* if ((bjets_tight.size()>0)&&!pushed_bT_subjets) {
             int subjetFlav_idx1 = -1 ;
             int subjetFlav_idx2 = -1 ;
             #if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
@@ -573,17 +588,47 @@ bool pushed_bT_subjets = false;
             JetObj bT_subjetidx1((r->SubJet_pt)[bjets_tight[0].m_idx1], (r->SubJet_eta)[bjets_tight[0].m_idx1], (r->SubJet_phi)[bjets_tight[0].m_idx1],
                               (r->SubJet_mass)[bjets_tight[0].m_idx1], subjetFlav_idx1, -1, -1, 
                               (r->SubJet_tau1)[bjets_tight[0].m_idx1], (r->SubJet_tau2)[bjets_tight[0].m_idx1], 
-                              (r->SubJet_tau3)[bjets_tight[0].m_idx1], (r->SubJet_tau4)[bjets_tight[0].m_idx1], -1, -1, -1);
+                              (r->SubJet_tau3)[bjets_tight[0].m_idx1], (r->SubJet_tau4)[bjets_tight[0].m_idx1], -1, -1, -1,(r->SubJet_n2b1)[bjets_tight[0].m_idx1], (r->SubJet_n3b1)[bjets_tight[0].m_idx1]);
             JetObj bT_subjetidx2((r->SubJet_pt)[bjets_tight[0].m_idx2], (r->SubJet_eta)[bjets_tight[0].m_idx2], (r->SubJet_phi)[bjets_tight[0].m_idx2],
                               (r->SubJet_mass)[bjets_tight[0].m_idx2], subjetFlav_idx2, -1, -1, 
                               (r->SubJet_tau1)[bjets_tight[0].m_idx2], (r->SubJet_tau2)[bjets_tight[0].m_idx2], 
-                              (r->SubJet_tau3)[bjets_tight[0].m_idx2], (r->SubJet_tau4)[bjets_tight[0].m_idx2], -1, -1, -1);
+                              (r->SubJet_tau3)[bjets_tight[0].m_idx2], (r->SubJet_tau4)[bjets_tight[0].m_idx2], -1, -1, -1,(r->SubJet_n2b1)[bjets_tight[0].m_idx2], (r->SubJet_n3b1)[bjets_tight[0].m_idx2]);
             bT_subjets.push_back(bT_subjetidx1);
             bT_subjets.push_back(bT_subjetidx2);
             pushed_bT_subjets = true;
-        }
+        }*/
 
   }
+/*
+       for (unsigned int i = 0 ; i < *(r->nSubJet) ; ++i) {
+       
+            
+            float eta = (r->SubJet_eta)[0]-(r->SubJet_eta)[1];
+            float phi = (r->SubJet_phi)[0]-(r->SubJet_phi)[1];
+            float test = sqrt(pow(eta,2)+pow(phi,2));
+        
+        //h_subjets_minpT_sumpT_deltaR_nocut->Fill((r->SubJet_pt[1])/(r->SubJet_pt[1]+r->SubJet_pt[0]),test);
+
+        //std::cout << "delta R: "<< test <<std::endl;
+        
+    
+        
+        
+    }
+
+    
+    if (Fatjet_plot.size()>0){
+
+    h_fatjet_mass_n2b1->Fill(Fatjet_plot[0].m_n2b1,Fatjet_plot[0].m_lvec.M());
+    h_fatjet_mass_mSD->Fill(Fatjet_plot[0].m_lvec.M(),Fatjet_plot[0].m_mSD);
+    h_fatjet_pT_mSD->Fill(Fatjet_plot[0].m_lvec.Pt(),Fatjet_plot[0].m_mSD);
+
+    }
+    for (unsigned int i = 0 ; i < Fatjet_plot.size() ; ++i) {
+    for (unsigned int j = 0 ; j < muons_test.size() ; ++j) {
+    h_dR_fatjet_lepton->Fill(Fatjet_plot[i].m_lvec.DeltaR(muons_test[j].m_lvec));
+    }
+    }*/
 
 /*for (unsigned int i = 0 ; i < (bjets_loose.size()) ; ++i) {
  std::cout << "QCD =" <<bjets_loose[i].m_particleNetMD_QCD<<std::endl;
@@ -599,7 +644,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
     
     //btag_w = CalBtagWeight(jets,CUTS.GetStr("jet_main_btagWP"),m_btagUncType) ;//FIXME
     //std::cout << "\n Btag: " << btag_w;
-    if (eles.size()>=2) eleSF_w = CalEleSF(eles[0],eles[1]) ; 
+    if (eles.size()>=2) eleSF_w = CalEleSF(eles[0],eles[1]) ;  
     if (muons.size()>=2) {
       muonSF_w = CalMuonSF_id_iso(muons[0],muons[1]);
       //std::cout << "\n Muon SF, " << muonSF_w;
@@ -657,7 +702,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
   if (!m_isData && (eles.size() >= 2)) {
     trigSF_ele =  CalTrigSF(11,eles[0], eles[1], trigObj_ele, h_dR1_eleTrig, h_dR2_eleTrig, h_pt1_eleTrig, h_pt2_eleTrig) ;
   }
- 
+
   
   float trigSF_muon(1) ;
   if (!m_isData && (muons.size() >= 2)) trigSF_muon =  CalTrigSF(13,muons[0], muons[1], trigObj_muon, h_dR1_muonTrig, h_dR2_muonTrig, h_pt1_muonTrig, h_pt2_muonTrig) ; //uncertainties already calculate inside CalTrigSF
@@ -712,7 +757,10 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
         if (jets.size() >= 1) { //1 inclusive jet
         //leading jets should pass kinematic cuts
            
-        if (jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(jets[0].m_idx1>0)&&(jets[0].m_idx2>0)){          
+        if (jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){ 
+          //std::cout << "deltaR between subjets: " << "  " << subjets[0].m_lvec.DeltaR(subjets[1].m_lvec)<<std::endl; 
+          //std::cout << "leading subjet pT: " << "  " << subjets[0].m_lvec.Pt()<<std::endl; 
+          //std::cout << "subleading subjet pT: " << "  " << subjets[1].m_lvec.Pt()<<std::endl; 
           h_zee_cutflow->Fill(6) ; //pass jet cuts
           h_zee_cutflow_medium->Fill(6) ; //pass jet cuts
           h_zee_cutflow_tight->Fill(6) ; //pass jet cuts
@@ -720,7 +768,6 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
           h_zee_jet->Fill(Z, jets[0],subjets[0],subjets[1], zee_w) ;
           h_zee_jet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zee_w);
  	  h_zee_jet->FillMet_Sig(*(r->MET_significance), zee_w);
-          
         
           // isolation
           float deltaRelelep0 = Z.m_lep0.m_lvec.DeltaR(jets[0].m_lvec);
@@ -744,23 +791,23 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
        }//end leading jet kinematic cuts
 
         //at least two jet
-        if (jets.size() >= 2 && jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(jets[0].m_idx1>0)&&(jets[0].m_idx2>0)) { //2 inclusive jet
+        /*if (jets.size() >= 2 && jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")) { //2 inclusive jet
           h_Zee_twojet_pt_jet1->Fill(jets[1].m_lvec.Pt(), zee_w) ;
           h_zee_twojet->Fill(Z, jets[0], subjets[0],subjets[1],zee_w) ;
           h_zee_twojet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zee_w);
           h_Zee_deltaR_ZJet1->Fill(Z.m_lvec.DeltaR(jets[1].m_lvec), zee_w);
  	  
-	} //end at least two jet
+	} *///end at least two jet
         
         //at least one b-tagged jets
         h_zee_bjet_loose->FillNjet(bjets_loose.size(),zeeb_w) ; 
-        h_zee_bjet_medium->FillNjet(bjets_medium.size(),zeeb_w) ; 
-        h_zee_bjet_tight->FillNjet(bjets_tight.size(),zeeb_w) ; 
-        if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zee_bjet_afterMET->FillNjet(bjets_loose.size(),zeeb_w);
+        //h_zee_bjet_medium->FillNjet(bjets_medium.size(),zeeb_w) ; 
+        //h_zee_bjet_tight->FillNjet(bjets_tight.size(),zeeb_w) ; 
+        //if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zee_bjet_afterMET->FillNjet(bjets_loose.size(),zeeb_w);
 
         
         if (bjets_loose.size() >=1 ) {
-           if (bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_loose[0].m_idx1>0)&&(bjets_loose[0].m_idx2>0)){
+           if (bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
           //std::cout<<"bjet after cut = "<< bjets[0].m_lvec.Pt()<<" "<<bjets[0].m_lvec.Eta()<<std::endl<<""<<PNet_T;
           h_zee_cutflow->Fill(7) ;
 
@@ -769,8 +816,8 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
  	  h_zee_bjet_loose->FillMet_Sig(*(r->MET_significance), zeeb_w);
         }
       }
-        if (bjets_medium.size() >=1 ) {
-           if (bjets_medium[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_medium[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_medium[0].m_idx1>0)&&(bjets_medium[0].m_idx2>0)){
+      /*  if (bjets_medium.size() >=1 ) {
+           if (bjets_medium[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_medium[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
           //std::cout<<"bjet after cut = "<< bjets[0].m_lvec.Pt()<<" "<<bjets[0].m_lvec.Eta()<<std::endl<<""<<PNet_T;
           h_zee_cutflow_medium->Fill(7) ;
 
@@ -778,9 +825,9 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
           h_zee_bjet_medium->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
  	  h_zee_bjet_medium->FillMet_Sig(*(r->MET_significance), zeeb_w);
         }
-      }
-        if (bjets_tight.size() >=1 ) {
-           if (bjets_tight[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_tight[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_tight[0].m_idx1>0)&&(bjets_tight[0].m_idx2>0)){
+      }*/
+       /* if (bjets_tight.size() >=1 ) {
+           if (bjets_tight[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_tight[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
           //std::cout<<"bjet after cut = "<< bjets[0].m_lvec.Pt()<<" "<<bjets[0].m_lvec.Eta()<<std::endl<<""<<PNet_T;
           h_zee_cutflow_tight->Fill(7) ;
 
@@ -788,7 +835,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
           h_zee_bjet_tight->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zeeb_w);
  	  h_zee_bjet_tight->FillMet_Sig(*(r->MET_significance), zeeb_w);
         }
-      }
+      }*/
         //at least two b-tagged jets
         if (bjets_loose.size() >=2 && bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")) {
           
@@ -814,7 +861,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
 	    h_zee_2bjet->FillMet_Sig(*(r->MET_significance), evtW);
             h_zee_2bjet->FillNjet(bjets_loose.size(),evtW) ; 
 
-#if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
+/*#if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
             if (bjets_loose[0].m_flav == 5 && bjets_loose[1].m_flav == 5) {
               h_zee_2bjet_bb->Fill(Z, bjets_loose[0], bjets_loose[1],bL_subjets[0],bL_subjets[1], evtW) ;
               h_zee_2bjet_bb->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
@@ -832,7 +879,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
               h_zee_2bjet_XX->Fill(Z, bjets_loose[0], bjets_loose[1], bL_subjets[0],bL_subjets[1],evtW) ;
               h_zee_2bjet_XX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
             }
-#endif
+#endif*/
           //} //end MET cut
         } //end two b-tagged PNET jets
 
@@ -894,7 +941,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
         h_zmm_jet->FillNjet(jets.size(), zmm_w) ;
         if (jets.size() >= 1) { //1 inclusive jet
         //leading jets should pass kinematic cuts
-        if (jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(jets[0].m_idx1>0)&&(jets[0].m_idx2>0)){
+        if (jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
           h_zmm_cutflow->Fill(6) ; //pass jet cuts
           h_zmm_cutflow_medium->Fill(6) ; //pass jet cuts
           h_zmm_cutflow_tight->Fill(6) ; //pass jet cuts
@@ -921,22 +968,22 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
          }//end leading jet kinematic cuts
         } //end at least one jet
 
-        if (jets.size() >= 2 && jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(jets[0].m_idx1>0)&&(jets[0].m_idx2>0)) { //2 inclusive jet
+        /*if (jets.size() >= 2 && jets[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(jets[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")) { //2 inclusive jet
 
           h_Zmm_twojet_pt_jet1->Fill(jets[1].m_lvec.Pt(),zmm_w) ;
           h_zmm_twojet->Fill(Z, jets[0], subjets[0],subjets[1],zmm_w) ;
           h_zmm_twojet->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmm_w);
           h_Zmm_deltaR_ZJet1->Fill(Z.m_lvec.DeltaR(jets[1].m_lvec), zmm_w);
-        } //end at least two jet
+        } *///end at least two jet
         
         //Zmm+bjets
         h_zmm_bjet_loose->FillNjet(bjets_loose.size(),zmmb_w) ; 
-        h_zmm_bjet_medium->FillNjet(bjets_medium.size(),zmmb_w) ; 	
-        h_zmm_bjet_tight->FillNjet(bjets_tight.size(),zmmb_w) ; 
-        if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zmm_bjet_afterMET->FillNjet(bjets_loose.size(),zmmb_w) ; 
+        //h_zmm_bjet_medium->FillNjet(bjets_medium.size(),zmmb_w) ; 	
+        //h_zmm_bjet_tight->FillNjet(bjets_tight.size(),zmmb_w) ; 
+        //if (*(r->MET_pt) < CUTS.Get<float>("MET")) h_zmm_bjet_afterMET->FillNjet(bjets_loose.size(),zmmb_w) ; 
         
         if (bjets_loose.size() >= 1) {
-          if (bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_loose[0].m_idx1>0)&&(bjets_loose[0].m_idx2>0)){
+          if (bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
           h_zmm_cutflow->Fill(7) ;
           
           h_zmm_bjet_loose->Fill(Z, bjets_loose[0], bL_subjets[0],bL_subjets[1],zmmb_w) ; 
@@ -944,24 +991,24 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
           h_zmm_bjet_loose->FillMet_Sig(*(r->MET_significance), zmmb_w);
          }
         }
-        if (bjets_medium.size() >= 1) {
-          if (bjets_medium[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_medium[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_medium[0].m_idx1>0)&&(bjets_medium[0].m_idx2>0)){
+        /*if (bjets_medium.size() >= 1) {
+          if (bjets_medium[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_medium[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
           h_zmm_cutflow_medium->Fill(7) ;
           
           h_zmm_bjet_medium->Fill(Z, bjets_medium[0], bM_subjets[0],bM_subjets[1],zmmb_w) ; 
           h_zmm_bjet_medium->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
           h_zmm_bjet_medium->FillMet_Sig(*(r->MET_significance), zmmb_w);
          }
-        }
-        if (bjets_tight.size() >= 1) {
-          if (bjets_tight[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_tight[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")&&(bjets_tight[0].m_idx1>0)&&(bjets_tight[0].m_idx2>0)){
+        }*/
+        /*if (bjets_tight.size() >= 1) {
+          if (bjets_tight[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_tight[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")){
           h_zmm_cutflow_tight->Fill(7) ;
           
           h_zmm_bjet_tight->Fill(Z, bjets_tight[0], bT_subjets[0],bT_subjets[1],zmmb_w) ; 
           h_zmm_bjet_tight->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), zmmb_w);
           h_zmm_bjet_tight->FillMet_Sig(*(r->MET_significance), zmmb_w);
          }
-        }
+        }*/
       
         //Zmm+2bjets
         if (bjets_loose.size() >= 2 && bjets_loose[0].m_lvec.Pt() >=CUTS.Get<float>("jet_pt") && fabs(bjets_loose[0].m_lvec.Eta()) < CUTS.Get<float>("jet_eta")) {
@@ -989,7 +1036,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
             h_zmm_2bjet->FillMet_Sig(*(r->MET_significance), evtW);
             
 
-#if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
+/*#if defined(MC_preVFP2016) || defined(MC_postVFP2016) || defined(MC_2017) || defined(MC_2018)
             if (bjets_loose[0].m_flav == 5 && bjets_loose[1].m_flav == 5) {
               h_zmm_2bjet_bb->Fill(Z, bjets_loose[0], bjets_loose[1], bL_subjets[0],bL_subjets[1],evtW) ;
               h_zmm_2bjet_bb->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
@@ -1008,7 +1055,7 @@ std::cout << "Xbb =" <<bjets_loose[i].m_particleNetMD_Xbb<<std::endl;
               h_zmm_2bjet_XX->FillMet(*(r->MET_pt), *(r->PuppiMET_pt), evtW);
             }
 
-#endif
+#endif*/
           
         } //end at least two b-tagged jets
        } //end met cut

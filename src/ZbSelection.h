@@ -40,44 +40,44 @@ private:
   //histograms
   ZbPlots* h_zee_jet ;
   ZbPlots* h_zmm_jet ;
-  ZbPlots* h_zee_twojet ;
-  ZbPlots* h_zmm_twojet ;
+  //ZbPlots* h_zee_twojet ;
+  //ZbPlots* h_zmm_twojet ;
   ZbPlots* h_zee_bjet_loose ;
-  ZbPlots* h_zee_bjet_medium ;
-  ZbPlots* h_zee_bjet_tight ;
-  ZbPlots* h_zee_bjet ;
-  ZbPlots* h_zee_bjet_afterMET ;
+  //ZbPlots* h_zee_bjet_medium ;
+  //ZbPlots* h_zee_bjet_tight ;
+  //ZbPlots* h_zee_bjet ;
+  //ZbPlots* h_zee_bjet_afterMET ;
   ZbPlots* h_zmm_bjet_loose ;
-  ZbPlots* h_zmm_bjet_medium ;
-  ZbPlots* h_zmm_bjet_tight ;
-  ZbPlots* h_zmm_bjet ;
-  ZbPlots* h_zmm_bjet_afterMET ;
+  //ZbPlots* h_zmm_bjet_medium ;
+  //ZbPlots* h_zmm_bjet_tight ;
+  //ZbPlots* h_zmm_bjet ;
+  //ZbPlots* h_zmm_bjet_afterMET ;
   Z2bPlots* h_zee_2bjet ;
-  Z2bPlots* h_zee_2bjet_bb ;
-  Z2bPlots* h_zee_2bjet_bX ;
-  Z2bPlots* h_zee_2bjet_XX ;
+  //Z2bPlots* h_zee_2bjet_bb ;
+  //Z2bPlots* h_zee_2bjet_bX ;
+  //Z2bPlots* h_zee_2bjet_XX ;
   Z2bPlots* h_zmm_2bjet ;
-  Z2bPlots* h_zmm_2bjet_bb ;
-  Z2bPlots* h_zmm_2bjet_bX ;
-  Z2bPlots* h_zmm_2bjet_XX ;
+  //Z2bPlots* h_zmm_2bjet_bb ;
+  //Z2bPlots* h_zmm_2bjet_bX ;
+  //Z2bPlots* h_zmm_2bjet_XX ;
 
-  ZbPlots* h_zee_bjet_deepJet ;
+ /* ZbPlots* h_zee_bjet_deepJet ;
   ZbPlots* h_zmm_bjet_deepJet ;
   Z2bPlots* h_zee_2bjet_deepJet ;
-  Z2bPlots* h_zmm_2bjet_deepJet ;
+  Z2bPlots* h_zmm_2bjet_deepJet ;*/
  
-  EffPlots* h_eff_b ;
+/*  EffPlots* h_eff_b ;
   EffPlots* h_eff_c ;
   EffPlots* h_eff_l ;
   EffPlots* h_eff_bdj ;
   EffPlots* h_eff_cdj ;
-  EffPlots* h_eff_ldj ;
+  EffPlots* h_eff_ldj ;*/
  
   //Unfolding Plots
-  UnfoldingPlots* h_zee_unfolding;
+ /* UnfoldingPlots* h_zee_unfolding;
   UnfoldingPlots* h_zmm_unfolding;
   UnfoldingPlots* h_zee_afterMET_unfolding;
-  UnfoldingPlots* h_zmm_afterMET_unfolding; 
+  UnfoldingPlots* h_zmm_afterMET_unfolding; */
   
 
   TH1D* h_evt ;
@@ -147,6 +147,11 @@ private:
   TH1D* h_Zmm_nbJet_loose_tagged ;  
   TH1D* h_Zmm_bJet_pt_loose_tagged ;  
   
+  TH2D* h_fatjet_mass_n2b1 ;  
+  TH2D* h_fatjet_mass_mSD ;  
+  TH2D* h_fatjet_pT_mSD ; 
+  TH1D* h_dR_fatjet_lepton ;  
+  TH2D* h_subjets_minpT_sumpT_deltaR_nocut ;  
 
 } ;
 
