@@ -1,7 +1,9 @@
 #ifndef ElectroWeakAnalysis_RoccoR_H
 #define ElectroWeakAnalysis_RoccoR_H
 
-#include <boost/math/special_functions/erf.hpp>
+//#include <boost/math/special_functions/erf.hpp>
+#include <cmath>
+#include <vector>
 
 struct CrystalBall{
     static const double pi;
@@ -76,11 +78,47 @@ struct CrystalBall{
 	if(d>a) return NC * (C - pow(F+s*d/G, 1-n) );
 	return Ns * (D - sqrtPiOver2 * erf(-d/sqrt2));
     }
+    
+        // Custom function to approximate the inverse error function
+    double custom_erf_inv(double x) const {
+        // Coefficients for approximation
+        const double a1 = 0.886226899;
+        const double a2 = -1.645349621;
+        const double a3 = 0.914624893;
+        const double a4 = -0.140543331;
+        const double b1 = -2.118377725;
+        const double b2 = 1.442710462;
+        const double b3 = -0.329097515;
+        const double b4 = 0.012229801;
+        const double c1 = -1.970840454;
+        const double c2 = -1.62490649;
+        const double c3 = 3.429567803;
+        const double c4 = 1.641345311;
+        const double d1 = 3.543889200;
+        const double d2 = 1.637067800;
+        double r, y;
+        if (std::abs(x) <= 0.7) {
+            r = x * x;
+            y = x * (((a4 * r + a3) * r + a2) * r + a1) /
+                ((((b4 * r + b3) * r + b2) * r + b1) * r + 1.0);
+        } else {
+            r = std::sqrt(-std::log((1.0 - std::abs(x)) / 2.0));
+            if (x < 0) {
+                y = -(((c4 * r + c3) * r + c2) * r + c1) /
+                     ((d2 * r + d1) * r + 1.0);
+            } else {
+                y = (((c4 * r + c3) * r + c2) * r + c1) /
+                    ((d2 * r + d1) * r + 1.0);
+            }
+        }
+        return y;
+    }
 
     double invcdf(double u) const{
 	if(u<cdfMa) return m + G*(F - pow(NC/u, k));
 	if(u>cdfPa) return m - G*(F - pow(C-u/NC, -k) );
-	return m - sqrt2 * s * boost::math::erf_inv((D - u/Ns )/sqrtPiOver2);
+	//return m - sqrt2 * s * boost::math::erf_inv((D - u/Ns )/sqrtPiOver2);
+	return m - sqrt2 * s * custom_erf_inv((D - u/Ns )/sqrtPiOver2);
     }
 };
 
