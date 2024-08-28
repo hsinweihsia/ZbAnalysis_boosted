@@ -29,8 +29,8 @@ class LepObj {
 class JetObj {
   
   public: 
-    JetObj(float pt, float eta, float phi, float mass, unsigned flav, float particleNetMD_QCD, float particleNetMD_Xbb, float tau1, float tau2, float tau3, float tau4, float msoftdrop,int idx1,int idx2) : m_flav(flav),m_particleNetMD_QCD(particleNetMD_QCD),
-m_particleNetMD_Xbb(particleNetMD_Xbb),m_tau1(tau1),m_tau2(tau2),m_tau3(tau3),m_tau4(tau4),m_mSD(msoftdrop),m_idx1(idx1),m_idx2(idx2) {
+    JetObj(float pt, float eta, float phi, float mass, unsigned flav, float particleNetMD_QCD, float particleNetMD_Xbb, float tau1, float tau2, float tau3, float tau4, float msoftdrop,int idx1,int idx2, float n2b1, float n3b1) : m_flav(flav),m_particleNetMD_QCD(particleNetMD_QCD),
+m_particleNetMD_Xbb(particleNetMD_Xbb),m_tau1(tau1),m_tau2(tau2),m_tau3(tau3),m_tau4(tau4),m_mSD(msoftdrop),m_idx1(idx1),m_idx2(idx2), m_n2b1(n2b1),m_n3b1(n3b1) {
     m_lvec.SetPtEtaPhiM(pt, eta, phi, mass) ;  
     } ;
 
@@ -72,6 +72,8 @@ m_particleNetMD_Xbb(particleNetMD_Xbb),m_tau1(tau1),m_tau2(tau2),m_tau3(tau3),m_
     float m_mSD;
     int m_idx1;
     int m_idx2;
+    float m_n2b1;
+                                                                                                                                     float m_n3b1;
 } ;
 
 class ZObj {
