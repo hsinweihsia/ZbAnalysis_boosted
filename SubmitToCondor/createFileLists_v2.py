@@ -3,16 +3,16 @@ import json
 import subprocess
 
 #########################################################
-samples_json = "../datasets_NanoUL_json.txt"
+samples_json = "../datasets_HT_json.txt"
 
-outDir = '../FileLists_NanoUL/'
+outDir = '../FileLists_HT/'
 os.system('mkdir ' + outDir)
 
 samples_input = []
 if len(sys.argv) > 1: 
   samples_input = sys.argv[1].split(',') #all, or DY_2J_amcatnlo_MC_2018
 
-print samples_input
+print (samples_input)
 
 with open(samples_json) as json_file:
   samples = json.load(json_file)
@@ -29,7 +29,7 @@ for k in samples_used:
   os.system('rm ' + fOutName)
   i = 0
   for s in samples[k]:
-    print "  ", s
+    print ("  ", s)
     #os.system('rm outTmp.txt')
     cmd = 'dasgoclient --query="file dataset=' + s + '" >| outTmp.txt'
     #cmd = 'dasgoclient --query="file dataset=' + s + '  instance=prod/phys03''" >| outTmp.txt'
@@ -50,9 +50,9 @@ for k in samples_used:
     
     ls = open("outTmp.txt",'r').readlines()
     if len(ls) == 0:
-      print ">>>>WARNING: ", s, " has no files"
+      print (">>>>WARNING: ", s, " has no files")
     else:
-      print ">>>>NFILES: ", s, " has ", len(ls), " files" 
+      print (">>>>NFILES: ", s, " has ", len(ls), " files")
     for l in ls:
       l = 'root:://cmsxrootd.fnal.gov//' + l
       fOut.write(l)
