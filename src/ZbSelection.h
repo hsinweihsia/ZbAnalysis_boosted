@@ -45,13 +45,13 @@ private:
   ZbPlots* h_zee_bjet_loose ;
   //ZbPlots* h_zee_bjet_medium ;
   //ZbPlots* h_zee_bjet_tight ;
-  //ZbPlots* h_zee_bjet ;
-  //ZbPlots* h_zee_bjet_afterMET ;
+  ZbPlots* h_zee_bjet ;
+  ZbPlots* h_zee_bjet_afterMET ;
   ZbPlots* h_zmm_bjet_loose ;
   //ZbPlots* h_zmm_bjet_medium ;
   //ZbPlots* h_zmm_bjet_tight ;
-  //ZbPlots* h_zmm_bjet ;
-  //ZbPlots* h_zmm_bjet_afterMET ;
+  ZbPlots* h_zmm_bjet ;
+  ZbPlots* h_zmm_bjet_afterMET ;
   Z2bPlots* h_zee_2bjet ;
   //Z2bPlots* h_zee_2bjet_bb ;
   //Z2bPlots* h_zee_2bjet_bX ;
@@ -152,7 +152,19 @@ private:
   TH2D* h_fatjet_pT_mSD ; 
   TH1D* h_dR_fatjet_lepton ;  
   TH2D* h_subjets_minpT_sumpT_deltaR_nocut ;  
-
+  
+  //check AK4-AK8 mathicng
+  TH1D* h_nAK4_jets ;  
+  TH1D* h_nAK8_jets ;  
+  TH1D* h_fatslenderjetsmatched ;   
+  
+  //opposite sign charge check
+  TH1D* h_nEvt_oppolepsign ;     
+  TH1D* h_nEvt_samelepsign ;
+  //tau study
+  TH1D* h_Jet_tau21 ;
+  TH1D* h_Jet_tau32 ;
+  
 } ;
 
 #endif

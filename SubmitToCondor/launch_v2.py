@@ -68,7 +68,7 @@ def make_input_file_list(nFile, outDir_file_list, file_list_name):
 
 
 #///////////////////////////////////////////////////////////////////
-runMode = 0 #0: submit, 1: check output and hadd output file
+runMode = 1 #0: submit, 1: check output and hadd output file
 #submit = False # for testing setup 
 submit = True # for executing submission 
 
@@ -81,8 +81,8 @@ nFile = 4
 dir_file_list = '../FileLists_NanoUL/'
 
 
-outputDir_eos = '/eos/uscms/store/user/hhsia/ZbAnalysis_boosted/btag_RC_check'
-outputDir_scratch = '/uscms/home/hhsia/nobackup/ZbAnalysis_boosted/CMSSW_10_6_4/src/Ana/root_files/btag_RC_check' 
+outputDir_eos = '/eos/uscms/store/user/hhsia/ZbAnalysis_boosted/subjet_study'
+outputDir_scratch = '/uscms/home/hhsia/nobackup/ZbAnalysis_boosted/CMSSW_10_6_4/src/Ana/root_files/subjet_study' 
  
 
 #Print setting

@@ -159,7 +159,7 @@ class ZbPlots
       h_met_sig = new TH1D(name + "_met_sig","",1000,0,1000);
       h_met_sig->Sumw2();
         
-      h_mSD = new TH1D(name + "_mSD","",300,0.,300.) ;
+ /*     h_mSD = new TH1D(name + "_mSD","",300,0.,300.) ;
       h_particleNetMD_QCD = new TH1D(name + "_particleNetMD_QCD","",4000,-20.0,20.0) ;
       h_particleNetMD_Xbb = new TH1D(name + "_particleNetMD_Xbb","",4000,-20.0,20.0) ;
       h_particleNetMD_XbbvsQCD = new TH1D(name + "_particleNetMD_XbbvsQCD","",4000,-20.0,20.0) ;
@@ -210,8 +210,8 @@ class ZbPlots
       h_subjet_InvM = new TH1D(name + "_subjet_InvM","",1000,0,1000) ;
       h_subjet_minPt_sumPt = new TH1D(name + "_subjet_minPt_sumPt","",1000,0,10) ;  
       h_subjet_minPt_sumPt_deltaR = new TH2D(name + "_subjet_minPt_sumPt_deltaR","",1000,0,10,10000,-0.5,9.5) ;  
-      h_jetMass_n2b1 = new TH2D(name + "_jetMass_n2b1","",50,0.,0.5,200,0.,200.) ;
-
+      h_jetMass_n2b1 = new TH2D(name + "_jetMass_n2b1","",50,0.,0.5,200,0.,200.) ;*/
+/*
       h_pt_sub0->Sumw2();
       h_phi_sub0->Sumw2();
       h_eta_sub0->Sumw2();
@@ -245,11 +245,12 @@ class ZbPlots
       h_subjet_minPt_sumPt->Sumw2();
       h_jetMass_n2b1->Sumw2();
       h_subjet_minPt_sumPt_deltaR->Sumw2();
-        
+        */
     
     } ;
     
-    void Fill(ZObj& Z, JetObj& J, JetObj& SubJ1, JetObj& SubJ2,float w=1) {
+    //void Fill(ZObj& Z, JetObj& J, JetObj& SubJ1, JetObj& SubJ2,float w=1) {
+    void Fill(ZObj& Z, JetObj& J, float w=1) {
   
       h_pt_lep0->Fill(Z.m_lep0.m_lvec.Pt(), w) ;
       h_phi_lep0->Fill(Z.m_lep0.m_lvec.Phi(), w) ;
@@ -280,7 +281,7 @@ class ZbPlots
       h_pt_dilepton->Fill((Z.m_lep0.m_lvec + Z.m_lep1.m_lvec).Pt(), w);
       h_phi_dilepton->Fill((Z.m_lep0.m_lvec + Z.m_lep1.m_lvec).Phi(), w);
       h_eta_dilepton->Fill((Z.m_lep0.m_lvec + Z.m_lep1.m_lvec).Eta(), w);
-
+/*
       h_mSV_jet->Fill(J.m_mSV, w);
 
          h_particleNetMD_QCD->Fill(J.m_particleNetMD_QCD, w) ;
@@ -327,7 +328,7 @@ class ZbPlots
       float pTmin = (pT1 < pT2) ? pT1 : pT2 ;
       h_subjet_minPt_sumPt->Fill((pTmin/(pT1+pT2),w));
       h_jetMass_n2b1->Fill(J.m_n2b1,J.m_lvec.M(),w);
-      h_subjet_minPt_sumPt_deltaR->Fill((pTmin/(pT1+pT2)),SubJ1.m_lvec.DeltaR(SubJ2.m_lvec), w);
+      h_subjet_minPt_sumPt_deltaR->Fill((pTmin/(pT1+pT2)),SubJ1.m_lvec.DeltaR(SubJ2.m_lvec), w);*/
         
     } ;
 
@@ -378,7 +379,7 @@ class ZbPlots
       histolist.push_back(h_met_puppi);
       histolist.push_back(h_met_sig);
 
-      histolist.push_back(h_particleNetMD_QCD) ;
+      /*histolist.push_back(h_particleNetMD_QCD) ;
       histolist.push_back(h_particleNetMD_Xbb) ;
       histolist.push_back(h_particleNetMD_XbbvsQCD) ;
       histolist.push_back(h_tau1_jet) ;
@@ -417,7 +418,7 @@ class ZbPlots
       histolist.push_back(h_subjet_InvM) ;
       histolist.push_back(h_subjet_minPt_sumPt) ;
       histolist.push_back(h_jetMass_n2b1) ;
-      histolist.push_back(h_subjet_minPt_sumPt_deltaR);
+      histolist.push_back(h_subjet_minPt_sumPt_deltaR);*/
 
       return histolist ; 
     }
@@ -455,7 +456,7 @@ class ZbPlots
     TH1D* h_met;
     TH1D* h_met_puppi;
     TH1D* h_met_sig;
-
+/*
     TH1D* h_particleNetMD_QCD ;
     TH1D* h_particleNetMD_Xbb ;
     TH1D* h_particleNetMD_XbbvsQCD ;
@@ -495,7 +496,7 @@ class ZbPlots
     TH1D* h_subjet_InvM;
     TH1D* h_subjet_minPt_sumPt;
     TH2D* h_jetMass_n2b1;
-    TH2D* h_subjet_minPt_sumPt_deltaR;
+    TH2D* h_subjet_minPt_sumPt_deltaR;*/
     
 } ;
 
@@ -540,8 +541,11 @@ class Z2bPlots : public ZbPlots{
       
     } ;
 
-    void Fill(ZObj& Z, JetObj& J, JetObj& J1, JetObj& SubJ1, JetObj& SubJ2,float w=1) {
-      ZbPlots::Fill(Z, J, SubJ1,SubJ2, w) ;
+    //void Fill(ZObj& Z, JetObj& J, JetObj& J1, JetObj& SubJ1, JetObj& SubJ2,float w=1) {
+
+      //ZbPlots::Fill(Z, J, SubJ1,SubJ2, w) ;
+      void Fill(ZObj& Z, JetObj& J, JetObj& J1, float w=1) {
+      ZbPlots::Fill(Z, J, w) ;
       h_pt_jet1->Fill(J1.m_lvec.Pt(), w) ;
       h_eta_jet1->Fill(J1.m_lvec.Eta(), w) ;
       h_phi_jet1->Fill(J1.m_lvec.Phi(), w) ;

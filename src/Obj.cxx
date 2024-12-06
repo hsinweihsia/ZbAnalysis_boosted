@@ -29,9 +29,13 @@ class LepObj {
 class JetObj {
   
   public: 
-    JetObj(float pt, float eta, float phi, float mass, unsigned flav, float particleNetMD_QCD, float particleNetMD_Xbb, float tau1, float tau2, float tau3, float tau4, float msoftdrop,int idx1,int idx2, float n2b1, float n3b1) : m_flav(flav),m_particleNetMD_QCD(particleNetMD_QCD),
+   /* JetObj(float pt, float eta, float phi, float mass, unsigned flav, float particleNetMD_QCD, float particleNetMD_Xbb, float tau1, float tau2, float tau3, float tau4, float msoftdrop,int idx1,int idx2, float n2b1, float n3b1) : m_flav(flav),m_particleNetMD_QCD(particleNetMD_QCD),
 m_particleNetMD_Xbb(particleNetMD_Xbb),m_tau1(tau1),m_tau2(tau2),m_tau3(tau3),m_tau4(tau4),m_mSD(msoftdrop),m_idx1(idx1),m_idx2(idx2), m_n2b1(n2b1),m_n3b1(n3b1) {
     m_lvec.SetPtEtaPhiM(pt, eta, phi, mass) ;  
+    } ;*/
+        JetObj(float pt, float eta, float phi, float mass, unsigned flav, 
+           float deepCSV, float deepJet) : m_flav(flav), m_deepCSV(deepCSV), m_deepJet(deepJet) {
+              m_lvec.SetPtEtaPhiM(pt, eta, phi, mass) ; 
     } ;
 
     virtual ~JetObj() {} ;
@@ -42,7 +46,7 @@ m_particleNetMD_Xbb(particleNetMD_Xbb),m_tau1(tau1),m_tau2(tau2),m_tau3(tau3),m_
         float dRtmp = m_lvec.DeltaR(it->m_lvec) ;
         if (dRtmp < minDr) minDr = dRtmp ;
       }
-      return minDr <= 0.8 ;
+      return minDr <= 0.4 ;
     }
 
     void SetSV(std::vector<TLorentzVector>& sv) {
@@ -59,10 +63,13 @@ m_particleNetMD_Xbb(particleNetMD_Xbb),m_tau1(tau1),m_tau2(tau2),m_tau3(tau3),m_
     } ;
 
     TLorentzVector m_lvec ;
+    
+   
     unsigned m_flav ;
     float m_deepCSV ;
     unsigned m_svIdx ;
     float m_mSV;
+    float m_deepJet;
     float m_particleNetMD_QCD; 
     float m_particleNetMD_Xbb; 
     float m_tau1; 
@@ -73,7 +80,7 @@ m_particleNetMD_Xbb(particleNetMD_Xbb),m_tau1(tau1),m_tau2(tau2),m_tau3(tau3),m_
     int m_idx1;
     int m_idx2;
     float m_n2b1;
-                                                                                                                                     float m_n3b1;
+    float m_n3b1;
 } ;
 
 class ZObj {

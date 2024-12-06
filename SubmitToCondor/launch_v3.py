@@ -266,8 +266,8 @@ debug = False
 dataSet_list = "../datasets_NanoUL_json.txt"
 nFile = 4
 dir_file_list = '../FileLists_NanoUL/'
-outputDir_eos = '/eos/uscms/store/user/hhsia/ZbAnalysis_boosted/subjet_study'
-outputDir_scratch = '/uscms/home/hhsia/nobackup/ZbAnalysis_boosted/CMSSW_14_0_6/src/Ana/root_files/subjet_study' 
+outputDir_eos = '/eos/uscms/store/user/hhsia/ZbAnalysis_boosted/AK4_study_reproduce_results'
+outputDir_scratch = '/uscms/home/hhsia/nobackup/ZbAnalysis_boosted/CMSSW_14_0_6/src/Ana/root_files/AK4_study_reproduce_results' 
 
 # Print setting
 print('=============================')
