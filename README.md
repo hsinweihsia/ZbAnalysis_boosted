@@ -10,7 +10,7 @@ The histograms can be grouped in src/Plots.cxx and initialized in SlaveBegin of 
 
 For convenience, the physics objects, leptons, and jets, for example, are wrapped by objects in src/Obj.cxx. They contain a TLorentzVector together with other variables (for example isolation for lepton and deepCSV for jet). All corrections are implemented in these object classes.
 
-To build the code type "make FORMAT=format_of_sample", "format_of_sample" can be MC_preVFP2016, MC_postVFP2016, MC_2017, MC_2018, DATA_pretVFP2016, DATA_postVFP2016, DATA_2017, DATA_2018, corresponding to four Ultra Legacy campagins. Use "make name_of_class.o" to compile a specific class. To clean: "make clean". The easiest way to compile the code is to execute the "make" inside the CMSSW environment.
+To build the code type "make FORMAT=format_of_sample", "format_of_sample" can be MC_preVFP2016, MC_postVFP2016, MC_2017, MC_2018, DATA_preVFP2016, DATA_postVFP2016, DATA_2017, DATA_2018, corresponding to four Ultra Legacy campagins. Use "make name_of_class.o" to compile a specific class. To clean: "make clean". The easiest way to compile the code is to execute the "make" inside the CMSSW environment.
 
 The workflow starts by executing the command line
  
