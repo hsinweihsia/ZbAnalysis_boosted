@@ -2,7 +2,7 @@ import awkward as ak
 import numpy as np
 from BTVNanoCommissioning.helpers.func import campaign_map
 
-
+"""
 def HLT_helper(events, triggers):
 
     checkHLT = ak.Array([hasattr(events.HLT, _trig) for _trig in triggers])
@@ -19,7 +19,61 @@ def HLT_helper(events, triggers):
     for t in trig_arrs:
         req_trig = req_trig | t
     return req_trig
+"""
+def HLT_helper(events, trigger_config, campaign=None):
+    """
+    Evaluates campaign-dependent HLT channels (e.g., eleTrig, muonTrig).
+    
+    Returns:
+    --------
+    trig_decisions : dict of ak.Array (bool)
+        Example output: {"eleTrig": array([True, False, ...]), "muonTrig": array([...])}
+    """
+    dataset_name = events.metadata.get("dataset", "unknown dataset")
 
+    # 1. Resolve campaign from CLI argument or events.metadata
+    if campaign is None:
+        campaign = events.metadata.get("campaign", events.metadata.get("era", None))
+
+    if campaign is None:
+        raise ValueError(
+            f"No campaign specified for dataset '{dataset_name}'. "
+            "Ensure --campaign is provided or set in events.metadata."
+        )
+
+    if campaign not in trigger_config:
+        raise KeyError(
+            f"Campaign '{campaign}' not found in trigger_config! "
+            f"Available campaigns: {list(trigger_config.keys())}"
+        )
+
+    campaign_triggers = trigger_config[campaign]
+    trig_decisions = {}
+
+    # 2. Evaluate each trigger channel (eleTrig, muonTrig, etc.)
+    for channel_name, path_list in campaign_triggers.items():
+        # Initialize result array to False for all events
+        channel_pass = np.zeros(len(events), dtype=bool)
+        
+        # Format paths with HLT_ prefix if needed
+        path_list = [p[4:] if p.startswith("HLT_") else p for p in path_list]
+        
+        # Find which paths actually exist in events.HLT
+        valid_paths = [p for p in path_list if hasattr(events.HLT, p)]
+
+        if not valid_paths:
+            print(
+                f"Warning: None of the HLT paths {path_list} for '{channel_name}' "
+                f"exist in dataset '{dataset_name}' ({campaign})."
+            )
+        else:
+            # Combine paths within the channel via logical OR
+            for path in valid_paths:
+                channel_pass = channel_pass | events.HLT[path]
+
+        trig_decisions[channel_name] = channel_pass
+
+    return trig_decisions
 
 def jet_id(events, campaign, max_eta=2.5, min_pt=20):
     # Run 3 NanoAODs have a bug in jetId
@@ -182,6 +236,78 @@ def jet_id(events, campaign, max_eta=2.5, min_pt=20):
 
 
 ## FIXME: Electron cutbased Id & MVA ID not exist in Winter22Run3 sample
+def ele_ip_mask(events, campaign):
+    ele_etaSC = (
+        events.Electron.eta + events.Electron.deltaEtaSC
+        if campaign not in ["Summer24", "Winter25", "Prompt25"]
+        else events.Electron.superclusterEta
+    )
+    dz = events.Electron.dz
+    dxy = events.Electron.dxy
+    ele_dz_b = float(0.1)
+    ele_dz_e = float(0.2)
+    ele_d0_b = float(0.05)
+    ele_d0_e = float(0.1)
+    # Barrel selection
+    ele_EB = (
+        (abs(ele_etaSC) < 1.4442)
+        & (abs(dz) < ele_dz_b)
+        & (abs(dxy) < ele_d0_b)
+    )
+    # Endcap selection
+    ele_EE = (
+        (abs(ele_etaSC) > 1.4442)
+        & (abs(dz) < ele_dz_e)
+        & (abs(dxy) < ele_d0_e)
+    )
+    # Keep electrons passing either EB or EE requirements
+    ele_EE_EB_req = ele_EB | ele_EE
+    return ele_EE_EB_req
+
+def lep_kin(electrons):
+    lep_kin_mask = (
+        (electrons.pt > 25)
+        & (abs(electrons.eta) < 2.4)
+    )
+    return lep_kin_mask
+
+def ele_EE_EB_removal (electrons):
+    ele_EB_mask = (
+        abs((electrons.eta)>1.57)
+    )
+    ele_end_mask = (
+        abs((electrons.eta)<1.44)
+    )
+    ele_EE_EB_mask = ele_EB_mask | ele_end_mask
+    return ele_EE_EB_mask
+
+def ele_ID (electrons):
+    ele_ID_mask = electrons.cutBased >= 4
+    return ele_ID_mask
+
+
+def mu_iso (muons):
+    mu_iso_mask = muons.pfRelIso04_all < 0.15
+    return mu_iso_mask
+
+def ele_for_jet_removal(electrons):
+    mask = (
+        (abs(electrons.eta) < 2.4)
+        & (electrons.pt > 25)
+        & (electrons.cutBased >= 4)
+    )
+    return mask
+
+
+
+def mu_for_jet_removal(muons):
+    mask = (
+        (abs(muons.eta) < 2.4)
+        & (muons.pt > 25)
+        & (muons.pfRelIso04_all < 0.15)
+    )
+    return mask
+
 def ele_cuttightid(events, campaign):
     ele_etaSC = (
         events.Electron.eta + events.Electron.deltaEtaSC

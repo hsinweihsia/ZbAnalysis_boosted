@@ -3921,7 +3921,7 @@ def common_shifts(self, events):
 
 
 # common weights
-def weight_manager(pruned_ev, SF_map, isSyst, ttbar_reweights=None, campaign=None):
+def weight_manager(pruned_ev, SF_map, isSyst, campaign=None):
     """
     Example for Scaling Factors (SFs):
     ```python
@@ -3933,6 +3933,8 @@ def weight_manager(pruned_ev, SF_map, isSyst, ttbar_reweights=None, campaign=Non
     # Gen info
     if "genWeight" in pruned_ev.fields:
         weights.add("genweight", pruned_ev.genWeight)
+    if SF_map is None:
+        return weights
     if "PSWeight" in pruned_ev.fields:
         # PS ISR/FSR weights
         add_ps_weight(weights, pruned_ev.PSWeight, isSyst)
@@ -3940,36 +3942,6 @@ def weight_manager(pruned_ev, SF_map, isSyst, ttbar_reweights=None, campaign=Non
         add_pdf_weight(weights, pruned_ev.LHEPdfWeight, isSyst)
     if "LHEScaleWeight" in pruned_ev.fields:
         add_scalevar_weight(weights, pruned_ev.LHEScaleWeight, isSyst)
-
-    is_mc = "genWeight" in pruned_ev.fields
-    has_genpart = "GenPart" in pruned_ev.fields
-    dataset_name = pruned_ev.metadata.get("dataset", "")
-    is_ttbar_mc = is_mc and has_genpart and ("TT" in dataset_name)
-
-    if is_ttbar_mc:
-        nom = top_pT_reweighting(pruned_ev.GenPart)
-    else:
-        nom = ak.ones_like(weights.weight())
-
-    if isSyst != False and is_ttbar_mc:
-        weights.add(
-            "ttbar_weight",
-            nom,
-            nom + np.abs(ak.ones_like(nom) - nom),
-            nom - np.abs(ak.ones_like(nom) - nom),
-        )
-    else:
-        weights.add("ttbar_weight", nom)
-
-    # Additional ttbar reweighting hooks (enabled via runner flag/environment)
-    # Apply only to MC ttbar samples.
-    if ttbar_reweights is None:
-        ttbar_reweights = os.environ.get("BTV_TTBAR_REWEIGHTS", "none")
-
-    if is_ttbar_mc and ttbar_reweights in ("hdamp_ml", "full"):
-        add_hdamp_ml_weight(weights, pruned_ev, campaign=campaign, isSyst=isSyst)
-    if is_ttbar_mc and ttbar_reweights == "full":
-        add_fragmentation_decay_weights(weights, pruned_ev, isSyst=isSyst)
 
     if "hadronFlavour" in pruned_ev.Jet.fields:
         syst_wei = True if isSyst != False else False

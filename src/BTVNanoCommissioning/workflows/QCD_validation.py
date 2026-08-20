@@ -11,17 +11,47 @@ from BTVNanoCommissioning.utils.array_writer import array_writer
 from BTVNanoCommissioning.helpers.update_branch import missing_branch
 from BTVNanoCommissioning.utils.correction import (
     load_lumi,
-    load_SF,
+    #load_SF,
     weight_manager,
-    common_shifts,
+    #common_shifts,
     reweighting,
 )
-from BTVNanoCommissioning.utils.selection import jet_cut, HLT_helper
-
+from BTVNanoCommissioning.utils.selection import *
+from coffea.analysis_tools import PackedSelection
 import correctionlib
 
 
 class NanoProcessor(processor.ProcessorABC):
+    trigger_config = {
+        # 2016 preVFP & postVFP 
+            "2016preVFP-UL": {
+                "eleTrig": ["Ele27_WPTight_Gsf"],
+                "muonTrig": ["IsoMu24", "IsoTkMu24"],
+        },
+            "2016postVFP-UL": {
+                "eleTrig": ["Ele27_WPTight_Gsf"],
+                "muonTrig": ["IsoMu24", "IsoTkMu24"],
+        },
+        # 2017
+            "2017-UL": {
+                "eleTrig": ["Ele32_WPTight_Gsf_L1DoubleEG"],
+                "muonTrig": ["IsoMu27"],
+        },
+        # 2018
+            "2018-UL": {
+                "eleTrig": ["Ele32_WPTight_Gsf"],
+                "muonTrig": ["IsoMu24"],
+            },
+        #Run 3 fix 
+        # 2018
+            "Summer24": {
+                "eleTrig": ["Ele32_WPTight_Gsf"],
+                "muonTrig": ["IsoMu24"],
+            },
+        }
+    
+    
+    
     # Define histograms
     def __init__(
         self,
@@ -42,8 +72,8 @@ class NanoProcessor(processor.ProcessorABC):
         self.noHist = noHist
         self.lumiMask = load_lumi(self._campaign)
         self.chunksize = chunksize
-        ## Load corrections
-        self.SF_map = load_SF(self._year, self._campaign)
+        ## Load corrections FIX LATER
+        #self.SF_map = load_SF(self._year, self._campaign)
 
     @property
     def accumulator(self):
@@ -52,16 +82,23 @@ class NanoProcessor(processor.ProcessorABC):
     def process(self, events):
         events = missing_branch(events)
         sumws = reweighting(events, self.isSyst)
-        vetoed_events, shifts = common_shifts(self, events)
+        #vetoed_events, shifts = common_shifts(self, events)
+        # Temporarily disable JME/common shifts
+        
 
-        return processor.accumulate(
-            self.process_shift(update(vetoed_events, collections), sumws, name)
-            for collections, name in shifts
-        )
+        return self.process_shift(events, sumws, None)
+        #return processor.accumulate(
+            #self.process_shift(update(vetoed_events, collections), sumws, name)
+            #for collections, name in shifts
+        #)
 
     def process_shift(self, events, sumws, shift_name):
         isRealData = not hasattr(events, "genWeight")
         dataset = events.metadata["dataset"]
+        selection = PackedSelection() #cutflow
+        cutflow = processor.defaultdict_accumulator(int)
+        cutflow_Zee = processor.defaultdict_accumulator(int)
+        cutflow_Zmm = processor.defaultdict_accumulator(int)
         output = {}
         if not self.noHist:
             output = histogrammer(
@@ -72,6 +109,9 @@ class NanoProcessor(processor.ProcessorABC):
 
         if shift_name is None:
             output["sumw"] = sumws["sumw"]
+            output["cutflow"] = cutflow
+            output["cutflow_Zee"] = cutflow_Zee
+            output["cutflow_Zmm"] = cutflow_Zmm
             if not isRealData and self.isSyst:
                 if "LHEPdfWeight" in events.fields:
                     output["PDF_sumwUp"] = sumws["PDF_sumwUp"]
@@ -96,7 +136,7 @@ class NanoProcessor(processor.ProcessorABC):
         #    Selections    #
         ####################
         ## HLT
-        # triggers = {trigger1 : [ptmin, ptmax], ...}
+        """
         triggers = {
             "PFJet40": [45, 80],
             "PFJet60": [80, 110],
@@ -109,14 +149,13 @@ class NanoProcessor(processor.ProcessorABC):
             "PFJet450": [520, 580],
             "PFJet500": [580, 1e7],
         }
-        # This has to be in ascending order, so that the prescale weight of the last passed trigger is kept
+        """
 
-        jet_mask = jet_cut(events, self._campaign, ptmin=20)
-        event_jet = events.Jet[jet_mask]
-        req_jets = ak.count(event_jet.pt, axis=1) >= 1
-
+        cutflow["Total Events"] += len(events)
+        
         req_trig = np.zeros(len(events), dtype="bool")
         trigbools = {}
+        """
         for trigger, ptrange in triggers.items():
             ptmin = ptrange[0]
             ptmax = ptrange[1]
@@ -128,14 +167,270 @@ class NanoProcessor(processor.ProcessorABC):
             )
             trigbools[trigger] = thistrigreq
             req_trig = (req_trig) | (thistrigreq)
-
+            """
         req_lumi = np.ones(len(events), dtype="bool")
         if isRealData:
             req_lumi = self.lumiMask(events.run, events.luminosityBlock)
         if shift_name is None:
             output = dump_lumi(events[req_lumi], output)
+            
+        #pass lumi_mask
+        events = events[req_lumi]
+        
+        
+        # -----------------------------------------------------------
+        # EVALUATE HLT TRIGGERS
+        # -----------------------------------------------------------
+        # Evaluate HLT_helper for the current chunk
+        trig_decisions = HLT_helper(
+            events, 
+            self.trigger_config, 
+            campaign=self._campaign # Or let it resolve via events.metadata
+        )
+        # Access the individual boolean arrays
+        ele_trig_pass = trig_decisions["eleTrig"]    # ak.Array of booleans
+        mu_trig_pass = trig_decisions["muonTrig"]  # ak.Array of booleans
+        selection.add("ele_trig", ele_trig_pass)
+        selection.add("muon_trig", mu_trig_pass)
+        
+        
+        #Electron selection
+        """
+        electrons = events.Electron
+        cutflow["ele_all"] += ak.sum(ak.num(electrons))
 
-        event_level = ak.fill_none(req_lumi & req_trig & req_jets, False)
+        ip_mask = ele_ip_mask(events, self._campaign)
+        ele_ip = electrons[ip_mask]
+       
+        
+        cutflow["ele_ip"] += ak.sum(ak.num(ele_ip))
+
+        ele_kin_mask = lep_kin(ele_ip)
+        ele_kin = ele_ip[ele_kin_mask]
+        ele_EE_EB_mask = ele_EE_EB_removal(ele_kin)
+        ele_EE_EB = ele_kin[ele_EE_EB_mask]
+        cutflow["ele_EE_EB_gap"] += ak.sum(ak.num(ele_EE_EB))
+        ele_id_mask = ele_ID(ele_EE_EB)
+        ele_id = ele_EE_EB[ele_id_mask]
+        cutflow["ele_ID"] += ak.sum(ak.num(ele_id))
+        """
+        
+        electrons = events.Electron
+        
+        # All electrons
+
+        ip_req = ele_ip_mask(events, self._campaign)
+
+        
+        # Object cutflow
+        
+        ele_ip = electrons[ip_req]
+        
+        ele_kin_mask = lep_kin(ele_ip)
+        ele_kin = ele_ip[ele_kin_mask]
+        
+        ele_EE_EB_mask = ele_EE_EB_removal(ele_kin)
+        ele_EE_EB = ele_kin[ele_EE_EB_mask]
+        
+        ele_id_mask = ele_ID(ele_EE_EB)
+        ele_id = ele_EE_EB[ele_id_mask]
+        
+        cutflow["ele_all"] += ak.sum(ak.num(electrons))
+        cutflow["ele_ip"] += ak.sum(ak.num(ele_ip))
+        cutflow["ele_kin"] += ak.sum(ak.num(ele_kin))
+        cutflow["ele_EE_EB"] += ak.sum(ak.num(ele_EE_EB))
+        cutflow["ele_ID"] += ak.sum(ak.num(ele_id))
+       
+        ele_req = ak.pad_none(ele_id, 2, axis=1) 
+        
+        #for jet-ele removal 
+        eles_jetOverlap_mask = ele_for_jet_removal(electrons)
+        eles_jetOverlap = electrons[eles_jetOverlap_mask]
+             
+        
+        
+        #Muon selection
+        muons = events.Muon
+        
+        #for jet-mu removal 
+        mus_jetOverlap_mask = mu_for_jet_removal(muons)
+        mus_jetOverlap = muons[mus_jetOverlap_mask]
+        
+        mu_kin_req = lep_kin(muons)
+        
+        
+        #cutflow 
+        
+        cutflow["mu_all"] += ak.sum(ak.num(muons))
+        mu_kin = muons[mu_kin_req]
+        cutflow["mu_kin"] += ak.sum(ak.num(mu_kin))
+
+        mu_ID_mask = mu_kin.mediumId
+        mu_ID = mu_kin[mu_ID_mask]
+        cutflow["mu_ID"] += ak.sum(ak.num(mu_ID))
+        
+        mu_iso_mask = mu_iso(mu_ID)
+        mu_iso_cut = mu_ID[mu_iso_mask]
+        cutflow["mu_iso"] += ak.sum(ak.num(mu_iso_cut))
+        
+        mu_req = ak.pad_none(mu_iso_cut, 2, axis=1) 
+        
+        for key, value in cutflow.items():
+            print(f"{key:20s} {value}")
+            
+            
+        #AK8 Jet selection
+        jets = events.FatJet
+        cutflow["jet_all"] += ak.sum(ak.num(jets))
+        
+        #Jet-electron overlap removal 
+        jet_ele_pairs = ak.cartesian(
+            {"jet": jets, "ele": eles_jetOverlap},
+            axis=1,
+            nested=True
+        )
+
+        dr_jet_ele = jet_ele_pairs.jet.delta_r(jet_ele_pairs.ele)
+
+        jet_ele_clean = ak.all(dr_jet_ele > 0.8, axis=2)
+        jets_ele_removed = jets[jet_ele_clean]
+        cutflow["jet_ele_removed"] += ak.sum(ak.num(jets_ele_removed))
+        
+        #Jet-muon overlap removal 
+        jet_mu_pairs = ak.cartesian(
+            {"jet": jets_ele_removed, "mu": mus_jetOverlap},
+            axis=1,
+            nested=True
+        )
+
+        dr_jet_mu = jet_mu_pairs.jet.delta_r(jet_mu_pairs.mu)
+
+        jet_mu_clean = ak.all(dr_jet_mu > 0.8, axis=2)
+        jets_mu_removed = jets_ele_removed[jet_mu_clean]
+        cutflow["jet_mu_removed"] += ak.sum(ak.num(jets_mu_removed))       
+        jet_ID_mask = jets_mu_removed.jetId >= 2
+        jets_ID = jets_mu_removed[jet_ID_mask]
+        
+        
+        cutflow["jet_ID"] += ak.sum(ak.num(jets_ID))
+        
+        subjet_mask = (
+            (jets_ID.subJetIdx1 >= 0)& (jets_ID.subJetIdx2 >= 0)
+        )
+        
+        jets_subjet_cut = jets_ID[subjet_mask]
+        cutflow["subjet_req"] += ak.sum(ak.num(jets_subjet_cut))
+        
+        jet_req = ak.pad_none(jets_subjet_cut, 1, axis=1) 
+
+        #######################
+        # Selected Zee events #
+        #######################
+        zee_cut = PackedSelection()
+        
+        zee_cut.add("trigger", ele_trig_pass)
+        
+        req_Zee_lepton = ak.fill_none(
+        (ak.count(ele_id.pt, axis=1) >= 2)
+        & (ele_req[:, 0].pt >= 35),
+        False,
+        )
+        zee_cut.add("electron", req_Zee_lepton)
+
+        Zee_mass = (ele_req[:, 0] + ele_req[:, 1]).mass
+
+        req_Zee_mass = ak.fill_none(
+        (Zee_mass >= 71) & (Zee_mass <= 111),
+        False,
+        )
+        zee_cut.add("Zmass", req_Zee_mass)
+        
+        req_Zee_MET = ak.fill_none(
+        events.MET.pt < 50,
+        False,
+        )
+        zee_cut.add("MET", req_Zee_MET)
+        
+        req_Zee_jet = ak.fill_none(
+        (ak.num(jet_req, axis=1) >= 1)
+        & (jet_req[:, 0].pt >= 200)
+        & (abs(jet_req[:, 0].eta) < 2.5),
+        False,
+        )
+        zee_cut.add("jet", req_Zee_jet)
+        
+        zee_cuts = [
+            "trigger",
+            "electron",
+            "Zmass",
+            "MET",
+            "jet",
+        ]
+        for i, cut in enumerate(zee_cuts):
+            passed = zee_cut.all(*zee_cuts[:i + 1])
+            cutflow_Zee[cut] += ak.sum(passed)
+        
+        zee_event_level = zee_cut.all(*zee_cuts)
+        zee_events = events[zee_event_level]
+            
+            
+        #######################
+        # Selected Zmm events #
+        #######################
+        zmm_cut = PackedSelection()
+        
+        zmm_cut.add("trigger", mu_trig_pass)
+        
+        req_Zmm_lepton = ak.fill_none(
+        (ak.count(mu_iso_cut.pt, axis=1) >= 2)
+        & (mu_req[:, 0].pt >= 35),
+        False,
+        )
+        zmm_cut.add("muon", req_Zmm_lepton)
+
+        Zmm_mass = (mu_req[:, 0] + mu_req[:, 1]).mass
+
+        req_Zmm_mass = ak.fill_none(
+        (Zmm_mass >= 71) & (Zee_mass <= 111),
+        False,
+        )
+        zmm_cut.add("Zmass", req_Zmm_mass)
+        
+        req_Zmm_MET = ak.fill_none(
+        events.MET.pt < 50,
+        False,
+        )
+        zmm_cut.add("MET", req_Zmm_MET)
+        
+        req_Zmm_jet = ak.fill_none(
+        (ak.num(jet_req, axis=1) >= 1)
+        & (jet_req[:, 0].pt >= 200)
+        & (abs(jet_req[:, 0].eta) < 2.5),
+        False,
+        )
+        zmm_cut.add("jet", req_Zmm_jet)
+        
+        zmm_cuts = [
+            "trigger",
+            "muon",
+            "Zmass",
+            "MET",
+            "jet",
+        ]
+        for i, cut in enumerate(zmm_cuts):
+            passed = zmm_cut.all(*zmm_cuts[:i + 1])
+            cutflow_Zmm[cut] += ak.sum(passed)   
+        
+       
+        
+        
+        zmm_event_level = zmm_cut.all(*zmm_cuts)
+        zmm_events = events[zmm_event_level]
+        
+        
+        event_level = zee_event_level | zmm_event_level
+        events_selected = events[event_level]
+        
         if len(events[event_level]) == 0:
             if self.isArray:
                 array_writer(
@@ -149,130 +444,23 @@ class NanoProcessor(processor.ProcessorABC):
                     empty=True,
                 )
             return {dataset: output}
-
-        ####################
-        # Selected objects #
-        ####################
-        pruned_ev = events[event_level]
-        pruned_ev["SelJet"] = event_jet[event_level]
-        pruned_ev["njet"] = ak.count(event_jet[event_level].pt, axis=1)
-        for trigger in triggers:
-            pruned_ev[trigger] = trigbools[trigger][event_level]
-
-        ###FIXME: https://gitlab.cern.ch/cms-btv-coordination/tasks/-/issues/188
-        if "JetSVs" in events.fields:
-            valid_events = (ak.count(pruned_ev.Jet.pt, axis=1) > 0) & (
-                ak.count(pruned_ev.JetSVs.pt, axis=1) > 0
-            )
-            filtered_events = pruned_ev[valid_events]
-
-            # Pad pruned_ev.JetSVs.jetIdx to match the length of pruned_ev.Jet
-            filtered_events.JetSVs.jetIdx = ak.pad_none(
-                filtered_events.JetSVs.jetIdx, len(filtered_events.Jet), clip=True
-            )
-
-            # Print the initial state of pruned_ev.Jet and pruned_ev.JetSVs.jetIdx
-            # print("pruned_ev.Jet", filtered_events.Jet)
-            # print("pruned_ev.JetSVs.jetIdx", filtered_events.JetSVs.jetIdx)
-
-            # Filter events where the number of Jet and JetSVs are the same
-            # equal_length_events = ak.count(filtered_events.Jet.pt, axis=1) == ak.count(filtered_events.JetSVs.pt, axis=1)
-            # same_length_events = filtered_events[equal_length_events]
-            # print("Number of events with equal number of Jet and JetSVs:", len(same_length_events))
-            # print("Same length pruned_ev.Jet", same_length_events.Jet)
-            # print("Same length pruned_ev.JetSVs.jetIdx", same_length_events.JetSVs.jetIdx)
-
-            # Count and print the number of events where JetSVs is longer than Jet
-            # longer_jetSVs_events = ak.count(events.JetSVs.pt, axis=1) > ak.count(events.Jet.pt, axis=1)
-            # longer_jetSVs_events = longer_jetSVs_events & (ak.count(events.Jet.pt, axis=1) == 0)
-            # num_longer_jetSVs_events = ak.sum(longer_jetSVs_events)
-            # print("Number of events where JetSVs is longer than Jet:", num_longer_jetSVs_events)
-            # print("Longer SV pruned_ev.Jet", events.Jet[longer_jetSVs_events])
-            # print("Longer SV pruned_ev.JetSVs.jetIdx", events.JetSVs.jetIdx[longer_jetSVs_events])
-
-            # Ensure that all indices are within the valid range for pruned_ev.Jet
-            valid_indices = (filtered_events.JetSVs.jetIdx >= 0) & (
-                filtered_events.JetSVs.jetIdx < ak.num(filtered_events.Jet)
-            )
-            if not np.all(valid_indices):
-                print(
-                    "Warning: Some indices in pruned_ev.JetSVs.jetIdx are out of range."
-                )
-                # Filter out invalid indices
-                filtered_events.JetSVs = filtered_events.JetSVs[valid_indices]
-
-            # Check if pruned_ev.JetSVs.jetIdx is empty after filtering
-            if len(filtered_events.JetSVs.jetIdx) == 0:
-                print("Warning: pruned_ev.JetSVs.jetIdx is empty after filtering.")
-                matched_JetSVs = ak.Array([])
-                lj_matched_JetSVs = ak.Array([])
-                lj_SVs = ak.Array([])
-                nJetSVs = ak.Array([])
-            else:
-                # Proceed with the assignment
-                matched_JetSVs = filtered_events.Jet[filtered_events.JetSVs.jetIdx]
-                lj_matched_JetSVs = matched_JetSVs[filtered_events.JetSVs.jetIdx == 0]
-                lj_SVs = filtered_events.JetSVs[filtered_events.JetSVs.jetIdx == 0]
-                nJetSVs = ak.count(lj_SVs.pt, axis=1)
-
-            # Print the final state of the variables
-            # print("matched_JetSVs:", matched_JetSVs)
-            # print("lj_matched_JetSVs:", lj_matched_JetSVs)
-            # print("lj_SVs:", lj_SVs)
-            # print("nJetSVs:", nJetSVs)
-
+ 
         ####################
         #     Output       #
         ####################
         # Configure SFs
         weights = weight_manager(
-            pruned_ev,
-            self.SF_map,
+            events[event_level],
+            None,
             self.isSyst,
-            ttbar_reweights=getattr(self, "ttbar_reweights", "none"),
             campaign=self._campaign,
         )
-        if isRealData:
-            if self._year == "2022":
-                run_num = "355374_362760"
-            elif self._year == "2023":
-                run_num = "366727_370790"
-            elif self._year == "2024":
-                run_num = "378985_386951"
-            else:
-                raise ValueError(
-                    f"Prescales for year {self._year} have not been defined!"
-                )
-
-            # if 369869 in pruned_ev.run: continue
-            psweight = np.zeros(len(pruned_ev))
-            for trigger, trigbool in trigbools.items():
-                psfile = f"src/BTVNanoCommissioning/data/Prescales/ps_weight_{trigger}_run{run_num}.json"
-                if not os.path.isfile(psfile):
-                    raise NotImplementedError(
-                        f"Prescale weights not available for {trigger} in {self._year}. Please run `scripts/dump_prescale.py -l <path-to-lumi-mask> -H {','.join(triggers.keys())}`."
-                    )
-                pseval = correctionlib.CorrectionSet.from_file(psfile)
-                thispsweight = pseval["prescaleWeight"].evaluate(
-                    pruned_ev.run,
-                    f"HLT_{trigger}",
-                    ak.values_astype(pruned_ev.luminosityBlock, np.float32),
-                )
-                psweight = ak.where(trigbool[event_level], thispsweight, psweight)
-            weights.add("psweight", psweight)
-
-        if "JetSVs" in events.fields:
-            if len(lj_matched_JetSVs) > 0:
-                lj_matched_JetSVs_genflav = ak.zeros_like(
-                    lj_matched_JetSVs.pt, dtype=int
-                )
-            else:
-                lj_matched_JetSVs_genflav = ak.Array([])
-
+        
         ####################
         #     Output       #
         ####################
         # Configure systematics
+        
         if shift_name is None:
             systematics = ["nominal"] + list(weights.variations)
         else:
@@ -281,7 +469,7 @@ class NanoProcessor(processor.ProcessorABC):
         # Configure histograms
         if not self.noHist:
             output = histo_writter(
-                pruned_ev, output, weights, systematics, self.isSyst, self.SF_map
+                events[event_level], output, weights, systematics, self.isSyst, None
             )
         # Output arrays
         if self.isArray:
