@@ -81,30 +81,51 @@ class NanoProcessor(processor.ProcessorABC):
 
     def process(self, events):
         events = missing_branch(events)
+        # make gen weight -1 or 1 
+        isRealData = not hasattr(events, "genWeight")
+        if not isRealData: 
+            events["genWeight_raw"] = events.genWeight
+            events["genWeight"] = ak.where(events.genWeight < 0, -1.0, 1.0)
         sumws = reweighting(events, self.isSyst)
         #vetoed_events, shifts = common_shifts(self, events)
         # Temporarily disable JME/common shifts
         
 
-        return self.process_shift(events, sumws, None)
+        return self.process_shift(events, sumws, None, isRealData)
         #return processor.accumulate(
             #self.process_shift(update(vetoed_events, collections), sumws, name)
             #for collections, name in shifts
         #)
 
-    def process_shift(self, events, sumws, shift_name):
-        isRealData = not hasattr(events, "genWeight")
+    def process_shift(self, events, sumws, shift_name, isRealData):
+        #isRealData = not hasattr(events, "genWeight")
         dataset = events.metadata["dataset"]
         selection = PackedSelection() #cutflow
         cutflow = processor.defaultdict_accumulator(int)
         cutflow_Zee = processor.defaultdict_accumulator(int)
         cutflow_Zmm = processor.defaultdict_accumulator(int)
+        if not isRealData and "genWeight_raw" in events.fields:
+            genWeight_raw = events.genWeight_raw
+            cutflow["genWeight_zero"] += ak.sum(genWeight_raw == 0)
+            cutflow["genWeight_neg"] += ak.sum(genWeight_raw < 0)
+            cutflow["genWeight_pos"] += ak.sum(genWeight_raw > 0)
+        if isRealData:
+            cutflow["genWeight_total"] += len(events)
+        else:
+            true_genWeight = (
+                events.genWeight_raw
+                if "genWeight_raw" in events.fields
+                else events.genWeight
+            )
+            sign_weight = ak.where(true_genWeight < 0, -1.0, 1.0)
+            cutflow["genWeight_total"] += ak.sum(sign_weight)
+            
         output = {}
         if not self.noHist:
             output = histogrammer(
-                events.Jet.fields,
+                events.FatJet.fields,
                 obj_list=["jet0"],
-                hist_collections=["common", "fourvec", "QCD"],
+                hist_collections=["custom_analysis"],
             )
 
         if shift_name is None:
@@ -389,9 +410,10 @@ class NanoProcessor(processor.ProcessorABC):
         zmm_cut.add("muon", req_Zmm_lepton)
 
         Zmm_mass = (mu_req[:, 0] + mu_req[:, 1]).mass
+        print("dilepton mass in muon channel: ", Zmm_mass)
 
         req_Zmm_mass = ak.fill_none(
-        (Zmm_mass >= 71) & (Zee_mass <= 111),
+        (Zmm_mass >= 71) & (Zmm_mass <= 111),
         False,
         )
         zmm_cut.add("Zmass", req_Zmm_mass)
@@ -448,13 +470,43 @@ class NanoProcessor(processor.ProcessorABC):
         ####################
         #     Output       #
         ####################
+        pruned_ev = events[event_level]
+        pruned_ev["is_zee"] = zee_event_level[event_level]
+        pruned_ev["is_zmm"] = zmm_event_level[event_level]
+        
+        pruned_ev["SelElectron"] = ele_req[event_level]
+        pruned_ev["SelMuon"] = mu_req[event_level]
+        
+        selected_jets = jets_subjet_cut[event_level]
+        pruned_ev["SelJet"] = selected_jets[:, 0] #leading AK8 jet
+        pruned_ev["njet"] = ak.num(selected_jets, axis=1)
+        
+        row = ak.local_index(pruned_ev.SubJet, axis=0)
+        
+        idx1 = pruned_ev["SelJet"].subJetIdx1
+        idx2 = pruned_ev["SelJet"].subJetIdx2
+        
+        pruned_ev["SelSubJet0"] = pruned_ev.SubJet[row, idx1]
+        pruned_ev["SelSubJet1"] = pruned_ev.SubJet[row, idx2]
+
+        #pruned_ev["SelSubJet0"] = pruned_ev.SubJet[
+        #    row, pruned_ev["SelJet"].subJetIdx1
+        #]
+        #pruned_ev["SelSubJet1"] = pruned_ev.SubJet[
+        #    row, pruned_ev["SelJet"].subJetIdx2
+        #]
+
+        
         # Configure SFs
         weights = weight_manager(
-            events[event_level],
+            pruned_ev,
             None,
             self.isSyst,
             campaign=self._campaign,
         )
+        nominal_weight = weights.weight()
+        print(f"[nominal] weight: {nominal_weight[:20]}")
+        print(f"[nominal] weight sum: {ak.sum(nominal_weight)}, min: {ak.min(nominal_weight)}, max: {ak.max(nominal_weight)}")
         
         ####################
         #     Output       #
@@ -469,7 +521,7 @@ class NanoProcessor(processor.ProcessorABC):
         # Configure histograms
         if not self.noHist:
             output = histo_writter(
-                events[event_level], output, weights, systematics, self.isSyst, None
+                pruned_ev, output, weights, systematics, self.isSyst, None
             )
         # Output arrays
         if self.isArray:
