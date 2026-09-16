@@ -19,6 +19,7 @@ from BTVNanoCommissioning.utils.correction import (
 from BTVNanoCommissioning.utils.selection import *
 from coffea.analysis_tools import PackedSelection
 import correctionlib
+from coffea.processor import column_accumulator
 
 
 class NanoProcessor(processor.ProcessorABC):
@@ -265,8 +266,8 @@ class NanoProcessor(processor.ProcessorABC):
         ele_req = ak.pad_none(ele_id, 2, axis=1) 
         
         #for jet-ele removal 
-        eles_jetOverlap_mask = ele_for_jet_removal(electrons)
-        eles_jetOverlap = electrons[eles_jetOverlap_mask]
+        eles_jetOverlap_mask = ele_for_jet_removal(ele_ip)
+        eles_jetOverlap = ele_ip[eles_jetOverlap_mask]
              
         
         
@@ -282,10 +283,11 @@ class NanoProcessor(processor.ProcessorABC):
         
         #cutflow 
         
+
+        
         cutflow["mu_all"] += ak.sum(ak.num(muons))
         mu_kin = muons[mu_kin_req]
         cutflow["mu_kin"] += ak.sum(ak.num(mu_kin))
-
         mu_ID_mask = mu_kin.mediumId
         mu_ID = mu_kin[mu_ID_mask]
         cutflow["mu_ID"] += ak.sum(ak.num(mu_ID))
@@ -296,8 +298,8 @@ class NanoProcessor(processor.ProcessorABC):
         
         mu_req = ak.pad_none(mu_iso_cut, 2, axis=1) 
         
-        for key, value in cutflow.items():
-            print(f"{key:20s} {value}")
+        #for key, value in cutflow.items():
+            #print(f"{key:20s} {value}")
             
             
         #AK8 Jet selection
@@ -343,6 +345,12 @@ class NanoProcessor(processor.ProcessorABC):
         cutflow["subjet_req"] += ak.sum(ak.num(jets_subjet_cut))
         
         jet_req = ak.pad_none(jets_subjet_cut, 1, axis=1) 
+        
+        
+        #for jet multiplicity histgorams
+        njet_all = ak.num(jets_subjet_cut, axis=1)
+        
+        
 
         #######################
         # Selected Zee events #
@@ -410,7 +418,7 @@ class NanoProcessor(processor.ProcessorABC):
         zmm_cut.add("muon", req_Zmm_lepton)
 
         Zmm_mass = (mu_req[:, 0] + mu_req[:, 1]).mass
-        print("dilepton mass in muon channel: ", Zmm_mass)
+        
 
         req_Zmm_mass = ak.fill_none(
         (Zmm_mass >= 71) & (Zmm_mass <= 111),
@@ -426,8 +434,8 @@ class NanoProcessor(processor.ProcessorABC):
         
         req_Zmm_jet = ak.fill_none(
         (ak.num(jet_req, axis=1) >= 1)
-        & (jet_req[:, 0].pt >= 200)
-        & (abs(jet_req[:, 0].eta) < 2.5),
+        & (jet_req[:, 0].pt >= np.float32(200))
+        & (abs(jet_req[:, 0].eta) < np.float32(2.5)),
         False,
         )
         zmm_cut.add("jet", req_Zmm_jet)
@@ -448,6 +456,18 @@ class NanoProcessor(processor.ProcessorABC):
         
         zmm_event_level = zmm_cut.all(*zmm_cuts)
         zmm_events = events[zmm_event_level]
+        
+        final_mask = zmm_event_level
+        pt_vals = ak.to_numpy(jet_req[:, 0].pt[final_mask])
+        eta_vals = ak.to_numpy(jet_req[:, 0].eta[final_mask])
+        run_vals = ak.to_numpy(events.run[final_mask])
+        lumi_vals = ak.to_numpy(events.luminosityBlock[final_mask])
+        evt_vals = ak.to_numpy(events.event[final_mask])
+
+
+        target = (np.abs(pt_vals - 200.0) < 0.001) & (np.abs(eta_vals - 1.237793) < 0.0001)
+        for r_, l_, e_, pt_, eta_ in zip(run_vals[target], lumi_vals[target], evt_vals[target], pt_vals[target],eta_vals[target]):
+            print(f"run={r_} lumi={l_} event={e_}  pt={pt_:.6f}  eta={eta_:.6f}")
         
         
         event_level = zee_event_level | zmm_event_level
@@ -479,7 +499,7 @@ class NanoProcessor(processor.ProcessorABC):
         
         selected_jets = jets_subjet_cut[event_level]
         pruned_ev["SelJet"] = selected_jets[:, 0] #leading AK8 jet
-        pruned_ev["njet"] = ak.num(selected_jets, axis=1)
+        #pruned_ev["njet"] = ak.num(selected_jets, axis=1)
         
         row = ak.local_index(pruned_ev.SubJet, axis=0)
         
@@ -488,7 +508,34 @@ class NanoProcessor(processor.ProcessorABC):
         
         pruned_ev["SelSubJet0"] = pruned_ev.SubJet[row, idx1]
         pruned_ev["SelSubJet1"] = pruned_ev.SubJet[row, idx2]
-
+        
+        
+        
+        if "njet" in output:
+            zee_prejet = zee_cut.all("trigger", "electron", "Zmass", "MET")
+            zmm_prejet = zmm_cut.all("trigger", "muon", "Zmass", "MET")
+            prejet_level = zee_prejet | zmm_prejet
+ 
+            if ak.sum(prejet_level) > 0:
+                prejet_ev = events[prejet_level]
+                prejet_is_zee = zee_prejet[prejet_level]
+                prejet_is_zmm = zmm_prejet[prejet_level]
+                prejet_njet = njet_all[prejet_level]
+ 
+                prejet_weights = weight_manager(
+                    prejet_ev, None, self.isSyst, campaign=self._campaign
+                )
+                prejet_weight = prejet_weights.weight()
+ 
+                for channel_name, mask in (("zee", prejet_is_zee), ("zmm", prejet_is_zmm)):
+                    output["njet"].fill(
+                        syst="nominal",
+                        channel=channel_name,
+                        njet=prejet_njet[mask],
+                        weight=prejet_weight[mask],
+                    )
+        
+        
         #pruned_ev["SelSubJet0"] = pruned_ev.SubJet[
         #    row, pruned_ev["SelJet"].subJetIdx1
         #]
@@ -505,8 +552,8 @@ class NanoProcessor(processor.ProcessorABC):
             campaign=self._campaign,
         )
         nominal_weight = weights.weight()
-        print(f"[nominal] weight: {nominal_weight[:20]}")
-        print(f"[nominal] weight sum: {ak.sum(nominal_weight)}, min: {ak.min(nominal_weight)}, max: {ak.max(nominal_weight)}")
+        #print(f"[nominal] weight: {nominal_weight[:20]}")
+        #print(f"[nominal] weight sum: {ak.sum(nominal_weight)}, min: {ak.min(nominal_weight)}, max: {ak.max(nominal_weight)}")
         
         ####################
         #     Output       #

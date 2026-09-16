@@ -7,7 +7,7 @@ JET_VARS = {
     "eta": (300, -3.0, 3.0, "$\\eta$"),
     "phi": (400, -4.0, 4.0, "$\\phi$"),
     "mass": (500, 0., 500., "Jet mass [GeV]"),
-    "msoftdrop": (300, 0.0, 300.0, "Soft-drop mass [GeV]"),
+    "mSD": (300, 0.0, 300.0, "Soft-drop mass [GeV]"),
     "tau21": (100, 0.0, 1.0, "$\\tau_{21}$"),
     "tau32": (100, 0.0, 1.0, "$\\tau_{32}$"),
 }
@@ -63,7 +63,7 @@ def get_histograms(axes, **kwargs):
     hists["njet"] = Hist.Hist(
         syst_axis,
         channel_axis,
-        Hist.axis.Integer(0, 10, name="njet", label="Number of AK8 jets"),
+        Hist.axis.Integer(0, 10, name="njet", label="Jet multiplicity"),
         storage=Hist.storage.Weight(),
     )
 
@@ -88,7 +88,13 @@ def get_histograms(axes, **kwargs):
                 Hist.axis.Regular(bins, lo, hi, name=var, label=f"{subjet} {label}"),
                 storage=Hist.storage.Weight(),
             )
-
+    hists["deltaR_subjets"] = Hist.Hist(
+        syst_axis,
+        channel_axis,
+        Hist.axis.Regular(10000,-0.5,9.5, name="dr", label="$\\Delta R$(subjet0, subjet1)"),
+        storage=Hist.storage.Weight(),
+    )
+            
     # --- Leptons: leading (0) and subleading (1) histogrammed separately ---
     for prefix, varmap in LEP_VARS.items():
         for idx in (0, 1):
@@ -99,6 +105,18 @@ def get_histograms(axes, **kwargs):
                     Hist.axis.Regular(bins, lo, hi, name=var, label=label),
                     storage=Hist.storage.Weight(),
                 )
+    hists["deltaR_lep0_Jet"] = Hist.Hist(
+        syst_axis,
+        channel_axis,
+        Hist.axis.Regular(10000,-0.5,9.5, name="dr", label="$\\Delta R$(Leading lepton, Leading Jet)"),
+        storage=Hist.storage.Weight(),
+    )
+    hists["deltaR_lep1_Jet"] = Hist.Hist(
+        syst_axis,
+        channel_axis,
+        Hist.axis.Regular(10000,-0.5,9.5, name="dr", label="$\\Delta R$(Subleading lepton, Leading Jet)"),
+        storage=Hist.storage.Weight(),
+    )
 
 
     # --- MET ---
@@ -132,6 +150,12 @@ def get_histograms(axes, **kwargs):
         syst_axis,
         channel_axis,
         Hist.axis.Regular(400, -4.0, 4.0, name="phi", label="Dilepton $\\phi$"),
+        storage=Hist.storage.Weight(),
+    )
+    hists["deltaR_ZJet"] = Hist.Hist(
+        syst_axis,
+        channel_axis,
+        Hist.axis.Regular(60, 0, 6, name="dr", label="$\\Delta R$(Z candidate, Leading Jet)"),
         storage=Hist.storage.Weight(),
     )
 

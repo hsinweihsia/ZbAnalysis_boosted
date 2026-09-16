@@ -244,10 +244,15 @@ def ele_ip_mask(events, campaign):
     )
     dz = events.Electron.dz
     dxy = events.Electron.dxy
-    ele_dz_b = float(0.1)
-    ele_dz_e = float(0.2)
-    ele_d0_b = float(0.05)
-    ele_d0_e = float(0.1)
+    #ele_dz_b = float(0.1)
+    #ele_dz_e = float(0.2)
+    #ele_d0_b = float(0.05)
+    #ele_d0_e = float(0.1)
+    ele_dz_b = 0.1
+    ele_dz_e = 0.2
+    ele_d0_b = 0.05
+    ele_d0_e = 0.1
+    
     # Barrel selection
     ele_EB = (
         (abs(ele_etaSC) < 1.4442)
@@ -265,21 +270,29 @@ def ele_ip_mask(events, campaign):
     return ele_EE_EB_req
 
 def lep_kin(electrons):
-    lep_kin_mask = (
-        (electrons.pt > 25)
-        & (abs(electrons.eta) < 2.4)
-    )
+    #pt  = ak.values_astype(electrons.pt, np.float32)
+    #eta = ak.values_astype(abs(electrons.eta), np.float32)  
+    pt = electrons.pt
+    eta = abs(electrons.eta)
+    #pt_cut  = np.float32(25.0)
+    #eta_cut = np.float32(2.4)
+    pt_cut  = 25.0
+    eta_cut = 2.4
+    lep_kin_mask = (pt >= pt_cut) & (eta <= eta_cut)
     return lep_kin_mask
 
-def ele_EE_EB_removal (electrons):
-    ele_EB_mask = (
-        abs((electrons.eta)>1.57)
-    )
-    ele_end_mask = (
-        abs((electrons.eta)<1.44)
-    )
-    ele_EE_EB_mask = ele_EB_mask | ele_end_mask
-    return ele_EE_EB_mask
+def ele_EE_EB_removal(electrons):
+    #eta = ak.values_astype(abs(electrons.eta), np.float32)
+    
+    #gap_min = np.float32(1.44)
+    #gap_max = np.float32(1.57)
+    eta = abs(electrons.eta)
+    gap_min = 1.44
+    gap_max = 1.57
+    # FIXED: Use gap_min and gap_max here!
+    keep_mask = ~((eta > gap_min) & (eta < gap_max))
+    return keep_mask
+
 
 def ele_ID (electrons):
     ele_ID_mask = electrons.cutBased >= 4
@@ -292,7 +305,7 @@ def mu_iso (muons):
 
 def ele_for_jet_removal(electrons):
     mask = (
-        (abs(electrons.eta) < 2.4)
+        (abs(electrons.eta) < 2.5)
         & (electrons.pt > 25)
         & (electrons.cutBased >= 4)
     )
@@ -302,11 +315,14 @@ def ele_for_jet_removal(electrons):
 
 def mu_for_jet_removal(muons):
     mask = (
-        (abs(muons.eta) < 2.4)
+        (abs(muons.eta) < 2.5)
         & (muons.pt > 25)
         & (muons.pfRelIso04_all < 0.15)
+        & (muons.mediumId)
     )
     return mask
+
+
 
 def ele_cuttightid(events, campaign):
     ele_etaSC = (

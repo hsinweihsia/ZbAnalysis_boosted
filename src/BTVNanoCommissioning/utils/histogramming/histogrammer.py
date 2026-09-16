@@ -88,10 +88,6 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
             w = weight[mask]
 
             # --- Event-level ---
-            if "njet" in output:
-                output["njet"].fill(
-                    syst=syst, channel=channel_name, njet=pruned_ev.njet[mask], weight=w
-                )
 
             # --- MET (flat, one per event) ---
             if "MET" in pruned_ev.fields:
@@ -145,6 +141,18 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
                             **{var: subjet[var]},
                             weight=w,
                         )
+            # --- deltaR between the two subjets ---
+            if (
+                "deltaR_subjets" in output
+                and "SelSubJet0" in pruned_ev.fields
+                and "SelSubJet1" in pruned_ev.fields
+            ):
+                subjet0 = pruned_ev["SelSubJet0"][mask]
+                subjet1 = pruned_ev["SelSubJet1"][mask]
+                dr = subjet0.delta_r(subjet1)
+                output["deltaR_subjets"].fill(
+                    syst=syst, channel=channel_name, dr=dr, weight=w
+                )
             # --- Leptons: leading (idx 0) and subleading (idx 1) filled separately ---
             # --- Leptons (ele for zee, mu for zmm) ---
             leptons = leptons_all[mask]
@@ -159,18 +167,39 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
                             **{var: lep[var]},
                             weight=w,
                         )
+            if "deltaR_lep0_Jet" in output:
+                output["deltaR_lep0_Jet"].fill(
+                    syst=syst,
+                    channel=channel_name,
+                    dr=leptons[:, 0].delta_r(jet0),
+                    weight=w,
+                )
+            if "deltaR_lep1_Jet" in output:
+                output["deltaR_lep1_Jet"].fill(
+                    syst=syst,
+                    channel=channel_name,
+                    dr=leptons[:, 1].delta_r(jet0),
+                    weight=w,
+                )
 
             # --- Dilepton system (leading + subleading lepton of this channel) ---
             dilep = leptons[:, 0] + leptons[:, 1]
-            for var in ("pt", "mass"):
+            for var in ("pt", "eta", "phi", "mass"):
                 histname = f"dilep_{var}"
-                if histname in output and var in dilep.fields:
+                if histname in output:
                     output[histname].fill(
                         syst=syst,
                         channel=channel_name,
-                        **{var: dilep[var]},
+                        **{var: getattr(dilep, var)},
                         weight=w,
                     )
+            if "deltaR_ZJet" in output:
+                output["deltaR_ZJet"].fill(
+                    syst=syst,
+                    channel=channel_name,
+                    dr=dilep.delta_r(jet0),
+                    weight=w,
+                )
 
     return output
 
