@@ -11,9 +11,9 @@ from BTVNanoCommissioning.utils.array_writer import array_writer
 from BTVNanoCommissioning.helpers.update_branch import missing_branch
 from BTVNanoCommissioning.utils.correction import (
     load_lumi,
-    #load_SF,
+    load_SF,
     weight_manager,
-    #common_shifts,
+    common_shifts,
     reweighting,
 )
 from BTVNanoCommissioning.utils.selection import *
@@ -74,7 +74,7 @@ class NanoProcessor(processor.ProcessorABC):
         self.lumiMask = load_lumi(self._campaign)
         self.chunksize = chunksize
         ## Load corrections FIX LATER
-        #self.SF_map = load_SF(self._year, self._campaign)
+        self.SF_map = load_SF(self._year, self._campaign)
 
     @property
     def accumulator(self):
@@ -88,15 +88,15 @@ class NanoProcessor(processor.ProcessorABC):
             events["genWeight_raw"] = events.genWeight
             events["genWeight"] = ak.where(events.genWeight < 0, -1.0, 1.0)
         sumws = reweighting(events, self.isSyst)
-        #vetoed_events, shifts = common_shifts(self, events)
+        vetoed_events, shifts = common_shifts(self, events)
         # Temporarily disable JME/common shifts
         
 
-        return self.process_shift(events, sumws, None, isRealData)
-        #return processor.accumulate(
-            #self.process_shift(update(vetoed_events, collections), sumws, name)
-            #for collections, name in shifts
-        #)
+        #return self.process_shift(events, sumws, None, isRealData)
+        return processor.accumulate(
+            self.process_shift(update(vetoed_events, collections), sumws, name,isRealData)
+            for collections, name in shifts
+        )
 
     def process_shift(self, events, sumws, shift_name, isRealData):
         #isRealData = not hasattr(events, "genWeight")
@@ -384,6 +384,7 @@ class NanoProcessor(processor.ProcessorABC):
         (ak.num(jet_req, axis=1) >= 1)
         & (jet_req[:, 0].pt >= 200)
         & (abs(jet_req[:, 0].eta) < 2.5),
+        & (jet_req[:, 0].msoftdrop >= 40),
         False,
         )
         zee_cut.add("jet", req_Zee_jet)
@@ -434,8 +435,9 @@ class NanoProcessor(processor.ProcessorABC):
         
         req_Zmm_jet = ak.fill_none(
         (ak.num(jet_req, axis=1) >= 1)
-        & (jet_req[:, 0].pt >= np.float32(200))
-        & (abs(jet_req[:, 0].eta) < np.float32(2.5)),
+        & (jet_req[:, 0].pt >= 200)
+        & (abs(jet_req[:, 0].eta) < 2.5),
+        & (jet_req[:, 0].msoftdrop >= 40),
         False,
         )
         zmm_cut.add("jet", req_Zmm_jet)
@@ -535,23 +537,59 @@ class NanoProcessor(processor.ProcessorABC):
                         weight=prejet_weight[mask],
                     )
         
+        #Background study: matching AK4 GenJet to AK8 reco Jets
+        if not isRealData:
+            GenJet = events.GenJet[event_level]
+            gen_jet_mask = (GenJet.pt >= 30) & (abs(GenJet.eta) < 2.4) 
+            gen_jets_candi = GenJet[gen_jet_mask]
+            #calculate the angular separation between reco AK8 jets and gen AK4 jets
+            dr_gen_AK4_to_ak8 = gen_jets_candi.delta_r(pruned_ev.SelJet)
+            matched_gen_jets = gen_jets_candi[dr_gen_AK4_to_ak8 < 0.4]
+            n_matched_AK4 = ak.num(matched_gen_jets, axis=1)   
+            AK4_gen_jets = ak.pad_none(matched_gen_jets, 2, axis=1)  
+            #flavor catagorization
+            leading_flavor = ak.fill_none(AK4_gen_jets[:, 0].hadronFlavour, 0)
+            subleading_flavor = ak.fill_none(AK4_gen_jets[:, 1].hadronFlavour, 0)
+            
+            is_bb = ((leading_flavor==5)&(subleading_flavor==5))
+            is_cc = ((leading_flavor==4)&(subleading_flavor==4))
+            is_bc = ((leading_flavor==5)&(subleading_flavor==4)) | ((leading_flavor==4)&(subleading_flavor==5))
+            is_b = ((leading_flavor==5) | (subleading_flavor==5)) & ~is_bb & ~is_bc
+            is_c = ((leading_flavor==4) | (subleading_flavor==4)) & ~is_cc & ~is_bc
+            
+            
+            jet_flavor = ak.where(
+                is_bb, "bb",
+                ak.where(
+                    is_cc, "cc",
+                    ak.where(
+                        is_bc, "bc",
+                        ak.where(is_b, "b", ak.where(is_c, "c", "light")),
+                    ),
+                ),
+            )
+            jet_flavor = ak.where(n_matched_AK4  == 0, "unmatched", jet_flavor)
+            pruned_ev["jet_flavor"] = jet_flavor
+            
         
-        #pruned_ev["SelSubJet0"] = pruned_ev.SubJet[
-        #    row, pruned_ev["SelJet"].subJetIdx1
-        #]
-        #pruned_ev["SelSubJet1"] = pruned_ev.SubJet[
-        #    row, pruned_ev["SelJet"].subJetIdx2
-        #]
-
         
         # Configure SFs
         weights = weight_manager(
             pruned_ev,
-            None,
+            self.SF_map,
             self.isSyst,
             campaign=self._campaign,
         )
         nominal_weight = weights.weight()
+        #ele_sf_weight = weights.partial_weight(include=["ele_Reco", "ele_ID"])
+        #print(f"[{dataset}] Electron SF weight (first 10):", ak.to_list(ele_sf_weight[:10]))
+        #print(f"[{dataset}] Electron SF weight sum:", ak.sum(ele_sf_weight))
+        #print(f"[{dataset}] Electron SF weight mean:", ak.mean(ele_sf_weight))
+        
+        #other_weight = weights.partial_weight(exclude=["ele_Reco", "ele_ID"])
+        #reconstructed = ele_sf_weight * other_weight
+        #print("Matches nominal weight?", ak.all(np.isclose(ak.to_numpy(reconstructed), ak.to_numpy(nominal_weight))))
+        
         #print(f"[nominal] weight: {nominal_weight[:20]}")
         #print(f"[nominal] weight sum: {ak.sum(nominal_weight)}, min: {ak.min(nominal_weight)}, max: {ak.max(nominal_weight)}")
         
@@ -568,8 +606,9 @@ class NanoProcessor(processor.ProcessorABC):
         # Configure histograms
         if not self.noHist:
             output = histo_writter(
-                pruned_ev, output, weights, systematics, self.isSyst, None
+                pruned_ev, output, weights, systematics, self.isSyst, self.SF_map
             )
+            print(f"[{dataset}] ele0_pt sum after histo_writter:", output["ele0_pt"].sum())
         # Output arrays
         if self.isArray:
             array_writer(

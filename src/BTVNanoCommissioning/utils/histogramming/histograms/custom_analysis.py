@@ -158,5 +158,34 @@ def get_histograms(axes, **kwargs):
         Hist.axis.Regular(60, 0, 6, name="dr", label="$\\Delta R$(Z candidate, Leading Jet)"),
         storage=Hist.storage.Weight(),
     )
+    
+    #background study
+    jet_flavor_axis = Hist.axis.StrCategory(
+        ["unmatched", "bb", "cc", "bc", "b", "c", "light"],
+        name="jet_flavor",
+        label="Z+HF category",
+        growth=False,
+    )
+ 
+    hists["flavor_yield"] = Hist.Hist(
+        syst_axis,
+        channel_axis,
+        jet_flavor_axis,
+        storage=Hist.storage.Weight(),
+    )
+    hists["flavor_jet0_pt"] = Hist.Hist(
+        syst_axis,
+        channel_axis,
+        jet_flavor_axis,
+        Hist.axis.Regular(1000, 0, 1000, name="pt", label="Leading jet $p_{T}$ [GeV]"),
+        storage=Hist.storage.Weight(),
+    )
+    hists["flavor_jet0_msoftdrop"] = Hist.Hist(
+        syst_axis,
+        channel_axis,
+        jet_flavor_axis,
+        Hist.axis.Regular(300, 0, 300, name="msoftdrop", label="Leading jet $m_{SD}$ [GeV]"),
+        storage=Hist.storage.Weight(),
+    )
 
     return hists

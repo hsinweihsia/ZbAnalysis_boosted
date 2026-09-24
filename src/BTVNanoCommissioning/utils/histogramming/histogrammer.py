@@ -86,6 +86,7 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
 
         for channel_name, mask, leptons_all, lep_prefix in channel_masks:
             w = weight[mask]
+            
 
             # --- Event-level ---
 
@@ -200,6 +201,32 @@ def histo_writter(pruned_ev, output, weights, systematics, isSyst, SF_map):
                     dr=dilep.delta_r(jet0),
                     weight=w,
                 )
+            #backgroun study
+            if "jet_flavor" in pruned_ev.fields:
+                for channel_name, mask in (("zee", pruned_ev.is_zee), ("zmm", pruned_ev.is_zmm)):
+                    w = weight[mask]
+                    flavor = pruned_ev.jet_flavor[mask]
+                    if "flavor_yield" in output:
+                        output["flavor_yield"].fill(
+                        syst=syst, channel=channel_name, jet_flavor=flavor, weight=w
+                        )
+                        if "flavor_jet0_pt" in output:
+                            output["flavor_jet0_pt"].fill(
+                            syst=syst,
+                            channel=channel_name,
+                            jet_flavor=flavor,
+                            pt=pruned_ev.SelJet[mask].pt,
+                            weight=w,
+                           )
+                        if "flavor_jet0_msoftdrop" in output:
+                            output["flavor_jet0_msoftdrop"].fill(
+                                syst=syst,
+                                channel=channel_name,
+                                jet_flavor=flavor,
+                                msoftdrop=pruned_ev.SelJet[mask].msoftdrop,
+                                weight=w,
+                            )
+
 
     return output
 

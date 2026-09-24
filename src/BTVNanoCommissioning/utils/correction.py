@@ -2342,6 +2342,7 @@ def btagSFs(event, correct_map, weights, SFtype, syst=False):
 
 def eleSFs(ele, correct_map, weights, syst=True, isHLT=False):
     allele = ele if ele.ndim > 1 else ak.singletons(ele)
+    #raise RuntimeError(f"Available EGM correction names: {list(correct_map['EGM'].keys())}")
 
     for sf in correct_map["EGM_cfg"].keys():
         sf_tokens = sf.split(" ")
@@ -2355,61 +2356,110 @@ def eleSFs(ele, correct_map, weights, syst=True, isHLT=False):
         if not isHLT and "Trig" in sf:
             continue
         sf_type = sf_name
+        
+        sfs_alle = np.ones(len(allele), dtype=np.float64)
+        sfs_alle_up = np.ones(len(allele), dtype=np.float64)
+        sfs_alle_down = np.ones(len(allele), dtype=np.float64)
+        
         for nele in range(ak.num(allele.pt)[0]):
+
             ele = allele[:, nele]
             ele_etaSC = ak.fill_none(ele.eta + ele.deltaEtaSC, -2.5)
             masknone = ak.is_none(ele.pt)
-            sfs_alle, sfs_alle_up, sfs_alle_down = (
-                np.ones_like(allele[:, 0].pt),
-                np.ones_like(allele[:, 0].pt),
-                np.ones_like(allele[:, 0].pt),
-            )
-
+            ele_pt_safe = ak.fill_none(ele.pt, 20.0)  # placeholder; masked out via masknone below
+            ele_phi_safe = ak.fill_none(ele.phi, 0.0)
+ 
+            #sfs_alle, sfs_alle_up, sfs_alle_down = (
+            #    np.ones_like(allele[:, 0].pt),
+            #    np.ones_like(allele[:, 0].pt),
+            #    np.ones_like(allele[:, 0].pt),
+            #)
             if "correctionlib" in str(type(correct_map["EGM"])):
-                ## reco SFs, split by pT
                 if "Reco" in sf:
-                    ele_pt = np.clip(ele.pt, 20, 74.99999)
-                    ele_pt_low = np.where(ele.pt >= 20, 19.99999, ele.pt)
-                    ele_pt_high = np.clip(ele.pt, 75, 10000)
-                    ## phi is used in Summer23
+                    ele_pt = np.clip(ele_pt_safe, 20, 74.99999)
+                    ele_pt_low = np.where(ele_pt_safe >= 20, 19.99999, ele_pt_safe)
+                    ele_pt_high = np.clip(ele_pt_safe, 75, 10000)
                     if "Summer23" in correct_map["campaign"]:
                         sfs_low = np.where(
-                            (ele.pt < 20.0) & ~masknone,
+                            (ele_pt_safe < 20.0) & ~masknone,
                             correct_map["EGM"][sf_id].evaluate(
-                                sf_campaign,
-                                "sf",
-                                "RecoBelow20",
-                                ele_etaSC,
-                                ele_pt_low,
-                                ele.phi,
+                                sf_campaign, "sf", "RecoBelow20", ele_etaSC, ele_pt_low, ele_phi_safe,
                             ),
                             1.0,
                         )
                         sfs_high = np.where(
-                            (ele.pt >= 75.0) & ~masknone,
+                            (ele_pt_safe >= 75.0) & ~masknone,
                             correct_map["EGM"][sf_id].evaluate(
-                                sf_campaign,
-                                "sf",
-                                "RecoAbove75",
-                                ele_etaSC,
-                                ele_pt_high,
-                                ele.phi,
+                                sf_campaign, "sf", "RecoAbove75", ele_etaSC, ele_pt_high, ele_phi_safe,
                             ),
-                            sfs_low,
+                            sfs_low, 
                         )
                         sfs = np.where(
-                            (ele.pt >= 20.0) & (ele.pt < 75.0) & ~masknone,
+                            (ele_pt_safe >= 20.0) & (ele_pt_safe < 75.0) & ~masknone,
                             correct_map["EGM"][sf_id].evaluate(
-                                sf_campaign,
-                                "sf",
-                                "Reco20to75",
-                                ele_etaSC,
-                                ele_pt,
-                                ele.phi,
+                                sf_campaign, "sf", "Reco20to75", ele_etaSC, ele_pt_safe, ele_phi_safe,
                             ),
                             sfs_high,
                         )
                         sfs = np.where(masknone, 1.0, sfs)
+        
+        
+        
+        #for nele in range(ak.num(allele.pt)[0]):
+        #    ele = allele[:, nele]
+        #    ele_etaSC = ak.fill_none(ele.eta + ele.deltaEtaSC, -2.5)
+        #    masknone = ak.is_none(ele.pt)
+        #    sfs_alle, sfs_alle_up, sfs_alle_down = (
+        #        np.ones_like(allele[:, 0].pt),
+        #        np.ones_like(allele[:, 0].pt),
+        #        np.ones_like(allele[:, 0].pt),
+        #    )
+
+        #    if "correctionlib" in str(type(correct_map["EGM"])):
+                ## reco SFs, split by pT
+        #        if "Reco" in sf:
+        #            ele_pt = np.clip(ele.pt, 20, 74.99999)
+        #            ele_pt_low = np.where(ele.pt >= 20, 19.99999, ele.pt)
+        #            ele_pt_high = np.clip(ele.pt, 75, 10000)
+                    ## phi is used in Summer23
+        #           if "Summer23" in correct_map["campaign"]:
+        #                sfs_low = np.where(
+        #                    (ele.pt < 20.0) & ~masknone,
+        #                    correct_map["EGM"][sf_id].evaluate(
+        #                        sf_campaign,
+        #                        "sf",
+        #                        "RecoBelow20",
+        #                        ele_etaSC,
+        #                        ele_pt_low,
+        #                        ele.phi,
+        #                    ),
+        #                    1.0,
+        #                )
+        #                sfs_high = np.where(
+        #                    (ele.pt >= 75.0) & ~masknone,
+        #                    correct_map["EGM"][sf_id].evaluate(
+        #                        sf_campaign,
+        #                        "sf",
+        #                        "RecoAbove75",
+        #                        ele_etaSC,
+        #                        ele_pt_high,
+        #                        ele.phi,
+        #                    ),
+        #                    sfs_low,
+        #                )
+        #                sfs = np.where(
+        #                    (ele.pt >= 20.0) & (ele.pt < 75.0) & ~masknone,
+        #                    correct_map["EGM"][sf_id].evaluate(
+        #                        sf_campaign,
+        #                        "sf",
+        #                        "Reco20to75",
+        #                        ele_etaSC,
+        #                        ele_pt,
+        #                        ele.phi,
+        #                    ),
+        #                    sfs_high,
+        #                )
+        #                sfs = np.where(masknone, 1.0, sfs)
 
                         if syst != False:
                             sfs_up_low = np.where(
@@ -2800,6 +2850,7 @@ def eleSFs(ele, correct_map, weights, syst=True, isHLT=False):
                 sfs_alle_up = sfs_alle_up * sfs_up
 
         sfname = sf_name
+        print(f"[eleSFs] {sfname} SF values (first 10): {ak.to_list(sfs_alle[:10])}")
         if syst:
             weights.add(sfname, sfs_alle, sfs_alle_up, sfs_alle_down)
         else:
@@ -2824,19 +2875,40 @@ def muSFs(mu, correct_map, weights, syst=False, isHLT=False):
             np.ones_like(allmu[:, 0].pt),
         )
         sf_type = sf_name
+        
+
         for nmu in range(ak.num(allmu.pt)[0]):
             mu = allmu[:, nmu]
             masknone = ak.is_none(mu.pt)
+            mu_pt_safe = ak.fill_none(mu.pt, 15.0)  # placeholder; masked out below regardless
+            
             if "Trig" in sf:
-                mu_pt = np.clip(mu.pt, 26.0, None)
+                mu_pt = np.clip(mu_pt_safe, 26.0, None)
             else:
                 pt_min = (
                     10.0
                     if correct_map["campaign"] in ["Summer24", "Winter25", "Prompt25"]
                     else 15.0
                 )
-                mu_pt = np.clip(mu.pt, pt_min, None)
-            mu_eta = np.clip(mu.eta, -2.4, 2.399999)
+            mu_pt = np.clip(mu_pt_safe, pt_min, None)
+            mu_eta = np.clip(ak.fill_none(mu.eta, 0.0), -2.4, 2.399999)
+    
+    
+    
+        
+        #for nmu in range(ak.num(allmu.pt)[0]):
+         #   mu = allmu[:, nmu]
+         #   masknone = ak.is_none(mu.pt)
+         #   if "Trig" in sf:
+         #       mu_pt = np.clip(mu.pt, 26.0, None)
+         #   else:
+         #       pt_min = (
+         #           10.0
+         #           if correct_map["campaign"] in ["Summer24", "Winter25", "Prompt25"]
+         #           else 15.0
+         #       )
+         #       mu_pt = np.clip(mu.pt, pt_min, None)
+         #   mu_eta = np.clip(mu.eta, -2.4, 2.399999)
             sfs = 1.0
             if "correctionlib" in str(type(correct_map["MUO"])):
                 sfs = np.where(
