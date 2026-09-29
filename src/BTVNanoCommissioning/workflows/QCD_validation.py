@@ -22,6 +22,7 @@ import correctionlib
 from coffea.processor import column_accumulator
 
 
+
 class NanoProcessor(processor.ProcessorABC):
     trigger_config = {
         # 2016 preVFP & postVFP 
@@ -383,7 +384,7 @@ class NanoProcessor(processor.ProcessorABC):
         req_Zee_jet = ak.fill_none(
         (ak.num(jet_req, axis=1) >= 1)
         & (jet_req[:, 0].pt >= 200)
-        & (abs(jet_req[:, 0].eta) < 2.5),
+        & (abs(jet_req[:, 0].eta) < 2.5)
         & (jet_req[:, 0].msoftdrop >= 40),
         False,
         )
@@ -436,7 +437,7 @@ class NanoProcessor(processor.ProcessorABC):
         req_Zmm_jet = ak.fill_none(
         (ak.num(jet_req, axis=1) >= 1)
         & (jet_req[:, 0].pt >= 200)
-        & (abs(jet_req[:, 0].eta) < 2.5),
+        & (abs(jet_req[:, 0].eta) < 2.5)
         & (jet_req[:, 0].msoftdrop >= 40),
         False,
         )
@@ -466,10 +467,6 @@ class NanoProcessor(processor.ProcessorABC):
         lumi_vals = ak.to_numpy(events.luminosityBlock[final_mask])
         evt_vals = ak.to_numpy(events.event[final_mask])
 
-
-        target = (np.abs(pt_vals - 200.0) < 0.001) & (np.abs(eta_vals - 1.237793) < 0.0001)
-        for r_, l_, e_, pt_, eta_ in zip(run_vals[target], lumi_vals[target], evt_vals[target], pt_vals[target],eta_vals[target]):
-            print(f"run={r_} lumi={l_} event={e_}  pt={pt_:.6f}  eta={eta_:.6f}")
         
         
         event_level = zee_event_level | zmm_event_level
@@ -510,6 +507,8 @@ class NanoProcessor(processor.ProcessorABC):
         
         pruned_ev["SelSubJet0"] = pruned_ev.SubJet[row, idx1]
         pruned_ev["SelSubJet1"] = pruned_ev.SubJet[row, idx2]
+        
+
         
         
         
@@ -581,6 +580,9 @@ class NanoProcessor(processor.ProcessorABC):
             campaign=self._campaign,
         )
         nominal_weight = weights.weight()
+        # Right after weights = weight_manager(...), for a few Zee events:
+
+            
         #ele_sf_weight = weights.partial_weight(include=["ele_Reco", "ele_ID"])
         #print(f"[{dataset}] Electron SF weight (first 10):", ak.to_list(ele_sf_weight[:10]))
         #print(f"[{dataset}] Electron SF weight sum:", ak.sum(ele_sf_weight))
@@ -608,7 +610,8 @@ class NanoProcessor(processor.ProcessorABC):
             output = histo_writter(
                 pruned_ev, output, weights, systematics, self.isSyst, self.SF_map
             )
-            print(f"[{dataset}] ele0_pt sum after histo_writter:", output["ele0_pt"].sum())
+        
+            
         # Output arrays
         if self.isArray:
             array_writer(

@@ -288,7 +288,7 @@ def load_SF(year, campaign, selMod="default", syst=False):
             if (
                 "histo.json" in "\t".join(list(conf["EGM"].values()))
                 or "histo.txt" in "\t".join(list(conf["EGM"].values()))
-                or "histo.root" in "\t".join(list(conf["EGM"].values()))
+                or "root" in "\t".join(list(conf["EGM"].values()))
             ):
                 _ele_path = f"BTVNanoCommissioning.data.EGM.{campaign}"
                 ext = extractor()
@@ -299,7 +299,7 @@ def load_SF(year, campaign, selMod="default", syst=False):
                             for k in correct_map["EGM_cfg"].keys()
                             if "histo.json" in correct_map["EGM_cfg"][k]
                             or "histo.txt" in correct_map["EGM_cfg"][k]
-                            or "histo.root" in correct_map["EGM_cfg"][k]
+                            or "root" in correct_map["EGM_cfg"][k]
                         ],
                         [
                             stack.enter_context(importlib.resources.path(_ele_path, f))
@@ -313,7 +313,7 @@ def load_SF(year, campaign, selMod="default", syst=False):
                             for paths, file in zip(inputs, real_paths)
                             if "histo.json" in str(file)
                             or "histo.txt" in str(file)
-                            or "histo.root" in str(file)
+                            or "root" in str(file)
                         ]
                     )
                     if syst:
@@ -2340,11 +2340,65 @@ def btagSFs(event, correct_map, weights, SFtype, syst=False):
     return weights
 
 
+def _dphi(a, b):
+    return (a - b + np.pi) % (2 * np.pi) - np.pi
+
+def add_ele_trig_sf(pruned_ev, evaluator, weights, name="ele_Trig",
+                    bits=2, pt_thresh=30.0, dr_max=0.2):
+    """Electron trigger SF via trigger-object matching (mirrors CalTrigSF in Selector.cpp).
+ 
+    - trigger object: highest-pT TrigObj with |id|==11, (filterBits & bits) != 0, pt > pt_thresh
+      (use the same bits / threshold as your C++ config)
+    - matched electron: the closer of the two selected electrons, with dR < dr_max
+    - SF = evaluator[name](supercluster eta, pt) of the matched electron; 1.0 if no match
+    - only applied to Zee events when pruned_ev has an is_zee field
+    """
+    
+    try:
+        lookup = evaluator[name]
+    except KeyError:
+        return weights
+ 
+    tobj = pruned_ev.TrigObj
+    sel = (abs(tobj.id) == 11) & ((tobj.filterBits & bits) != 0) & (tobj.pt > pt_thresh)
+    tobj = tobj[sel]
+    best = ak.firsts(tobj[ak.argmax(tobj.pt, axis=1, keepdims=True)])  # None if no object
+ 
+    ele = ak.pad_none(pruned_ev.SelElectron, 2, axis=1, clip=True)     # exactly 2 slots
+    e_eta = ak.to_numpy(ak.fill_none(ele.eta, 999.0)).astype(np.float64)    # (n, 2); empty slot -> far away
+    e_phi = ak.to_numpy(ak.fill_none(ele.phi, 0.0)).astype(np.float64)
+    b_eta = ak.to_numpy(ak.fill_none(best.eta, np.nan)).astype(np.float64)  # (n,); no trigger object -> nan
+    b_phi = ak.to_numpy(ak.fill_none(best.phi, np.nan)).astype(np.float64)
+    dr = np.sqrt((e_eta - b_eta[:, None]) ** 2 + _dphi(e_phi, b_phi[:, None]) ** 2)
+    dr = np.where(np.isfinite(dr), dr, 999.0)                                       # (n, 2)
+ 
+    use0 = (dr[:, 0] < dr[:, 1]) & (dr[:, 0] < dr_max)
+    use1 = (dr[:, 1] < dr[:, 0]) & (dr[:, 1] < dr_max)
+    
+    
+    def _pick(arr, fallback):
+        a = ak.to_numpy(ak.fill_none(arr, fallback)).astype(np.float64)
+        return np.where(use0, a[:, 0], np.where(use1, a[:, 1], fallback))
+ 
+    pt = _pick(ele.pt, 30.0)
+    eta_sc = _pick(ele.eta + ele.deltaEtaSC, 0.0)    # x = eta, y = pT
+ 
+    sf = np.asarray(lookup(eta_sc, pt), dtype=np.float64)
+    matched = use0 | use1
+    if "is_zee" in pruned_ev.fields:
+        matched = matched & ak.to_numpy(pruned_ev.is_zee)
+    weights.add(name, np.where(matched, sf, 1.0))
+    return weights
+
 def eleSFs(ele, correct_map, weights, syst=True, isHLT=False):
     allele = ele if ele.ndim > 1 else ak.singletons(ele)
     #raise RuntimeError(f"Available EGM correction names: {list(correct_map['EGM'].keys())}")
 
     for sf in correct_map["EGM_cfg"].keys():
+        # Only apply SFs for lepton pass HLT
+        if not isHLT and "Trig" in sf:
+            continue 
+            
         sf_tokens = sf.split(" ")
         sf_name = sf_tokens[0]
         sf_campaign = sf_tokens[1]
@@ -2353,8 +2407,8 @@ def eleSFs(ele, correct_map, weights, syst=True, isHLT=False):
             sf_campaign = "2024Prompt"
 
         ## Only apply SFs for lepton pass HLT filter
-        if not isHLT and "Trig" in sf:
-            continue
+        #if not isHLT and "Trig" in sf:
+            #continue
         sf_type = sf_name
         
         sfs_alle = np.ones(len(allele), dtype=np.float64)
@@ -2379,7 +2433,23 @@ def eleSFs(ele, correct_map, weights, syst=True, isHLT=False):
                     ele_pt = np.clip(ele_pt_safe, 20, 74.99999)
                     ele_pt_low = np.where(ele_pt_safe >= 20, 19.99999, ele_pt_safe)
                     ele_pt_high = np.clip(ele_pt_safe, 75, 10000)
-                    if "Summer23" in correct_map["campaign"]:
+                    if sf_id.startswith("UL-"):
+                        sfs_low = np.where(
+                            (ele.pt < 20.0) & ~masknone,
+                            correct_map["EGM"][sf_id].evaluate(
+                                sf_campaign, "sf", "RecoBelow20", ele_etaSC, ele_pt_low,
+                            ),
+                            1.0,
+                        )
+                        sfs = np.where(
+                            (ele.pt >= 20.0) & ~masknone,
+                            correct_map["EGM"][sf_id].evaluate(
+                                sf_campaign, "sf", "RecoAbove20", ele_etaSC, 
+                                np.clip(ele_pt_safe, 20, 10000),  
+                            ),
+                            sfs_low,
+                        )
+                    elif "Summer23" in correct_map["campaign"]:
                         sfs_low = np.where(
                             (ele_pt_safe < 20.0) & ~masknone,
                             correct_map["EGM"][sf_id].evaluate(
@@ -2850,7 +2920,7 @@ def eleSFs(ele, correct_map, weights, syst=True, isHLT=False):
                 sfs_alle_up = sfs_alle_up * sfs_up
 
         sfname = sf_name
-        print(f"[eleSFs] {sfname} SF values (first 10): {ak.to_list(sfs_alle[:10])}")
+        
         if syst:
             weights.add(sfname, sfs_alle, sfs_alle_up, sfs_alle_down)
         else:
@@ -3993,6 +4063,14 @@ def common_shifts(self, events):
 
 
 # common weights
+ELE_TRIG_MATCH = {
+    "2018-UL": dict(bits=2, pt_thresh=32),     # replace with your 2018 C++ values
+    "2017-UL": dict(bits=2, pt_thresh=32),
+    "2016postVFP-UL": dict(bits=2, pt_thresh=27),
+    "2016preVFP-UL": dict(bits=2, pt_thresh=27)
+}
+
+
 def weight_manager(pruned_ev, SF_map, isSyst, campaign=None):
     """
     Example for Scaling Factors (SFs):
@@ -4028,6 +4106,8 @@ def weight_manager(pruned_ev, SF_map, isSyst, campaign=None):
             muSFs(pruned_ev.SelMuon, SF_map, weights, syst_wei, True)
         if "EGM" in SF_map.keys() and "SelElectron" in pruned_ev.fields:
             eleSFs(pruned_ev.SelElectron, SF_map, weights, syst_wei, False)
+            if "EGM_custom" in SF_map and "TrigObj" in pruned_ev.fields and campaign in ELE_TRIG_MATCH:
+                add_ele_trig_sf(pruned_ev, SF_map["EGM_custom"], weights, **ELE_TRIG_MATCH[campaign])  
         if (
             "ctag" in SF_map.keys() or "btag" in SF_map.keys()
         ) and "SelJet" in pruned_ev.fields:

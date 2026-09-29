@@ -193,6 +193,8 @@ correction_config = {
                 #"ele_Reco 2018 Electron-ID-SF": "",
                 "ele_Reco 2018 UL-Electron-ID-SF": "RecoAbove20",
                 "ele_ID 2018 UL-Electron-ID-SF": "Tight",
+                "ele_Trig EGamma_SF2D": "egammaTrigEffi_wp90noiso_EGM2D_2018.root",
+
                 #"ele_ID 2018 Electron-ID-SF": "wp80iso",
             },
             "muonSS": "",
@@ -205,8 +207,8 @@ correction_config = {
                 "MUO": "Run2-2018-UL-NanoAODv9",  # Nanov15 unavailable
                 "muonSS": "Run2-2018-UL-NanoAODv9",  # Nanov15 unavailable
                 "EGM": "Run2-2018-UL-NanoAODv9",
-                "electronSS": "Run2-2018-UL-NanoAODv15",
-                "jetveto": "Run2-2018-UL-NanoAODv15",
+                "electronSS": "Run2-2018-UL-NanoAODv9",
+                "jetveto": "Run2-2018-UL-NanoAODv9",
             },
         },
         "tt_semilep_mu": {
