@@ -41,8 +41,9 @@ correction_config = {
                 "mu_Iso": "NUM_TightRelIso_DEN_TightIDandIPCut",
             },
             "EGM": {
-                "ele_Reco 2016 Electron-ID-SF": "",
-                "ele_ID 2016 Electron-ID-SF": "wp80iso",
+                "ele_Reco 2016preVFP UL-Electron-ID-SF": "RecoAbove20",
+                "ele_ID 2016preVFP UL-Electron-ID-SF": "Tight",
+                "ele_Trig EGamma_SF2D": "egammaTrigEffi_wp90noiso_preVFP_EGM2D_2016.root",
             },
             "muonSS": "",
             "electronSS": [
@@ -53,10 +54,10 @@ correction_config = {
             "cvmfs_override": {
                 "MUO": "Run2-2016preVFP-UL-NanoAODv9",  # Nanov15 unavailable
                 "muonSS": "Run2-2016preVFP-UL-NanoAODv9",  # Nanov15 unavailable
-                "EGM": "Run2-2016preVFP-UL-NanoAODv15",
-                "electronSS": "Run2-2016preVFP-UL-NanoAODv15",
-                "jetveto": "Run2-2016preVFP-UL-NanoAODv15",
-                "JME": "Run2-2016preVFP-UL-NanoAODv15",
+                "EGM": "Run2-2016preVFP-UL-NanoAODv9",
+                "electronSS": "Run2-2016preVFP-UL-NanoAODv9",
+                "jetveto": "Run2-2016preVFP-UL-NanoAOD9",
+                "JME": "Run2-2016preVFP-UL-NanoAODv9",
             },
         },
         "tt_semilep_mu": {
@@ -90,8 +91,9 @@ correction_config = {
                 "mu_Iso": "NUM_TightRelIso_DEN_TightIDandIPCut",
             },
             "EGM": {
-                "ele_Reco 2016 Electron-ID-SF": "",
-                "ele_ID 2016 Electron-ID-SF": "wp80iso",
+                "ele_Reco 2016postVFP UL-Electron-ID-SF": "RecoAbove20",
+                "ele_ID 2016postVFP UL-Electron-ID-SF": "Tight",
+                "ele_Trig EGamma_SF2D": "egammaTrigEffi_wp90noiso_postVFP_EGM2D_2016.root",
             },
             "muonSS": "",
             "electronSS": [
@@ -102,10 +104,10 @@ correction_config = {
             "cvmfs_override": {
                 "MUO": "Run2-2016postVFP-UL-NanoAODv9",  # Nanov15 unavailable
                 "muonSS": "Run2-2016postVFP-UL-NanoAODv9",  # Nanov15 unavailable
-                "EGM": "Run2-2016postVFP-UL-NanoAODv15",
-                "electronSS": "Run2-2016postVFP-UL-NanoAODv15",
-                "jetveto": "Run2-2016postVFP-UL-NanoAODv15",
-                "JME": "Run2-2016postVFP-UL-NanoAODv15",
+                "EGM": "Run2-2016postVFP-UL-NanoAODv9",
+                "electronSS": "Run2-2016postVFP-UL-NanoAODv9",
+                "jetveto": "Run2-2016postVFP-UL-NanoAODv9",
+                "JME": "Run2-2016postVFP-UL-NanoAODv9",
             },
         },
         "tt_semilep_mu": {
@@ -141,8 +143,9 @@ correction_config = {
                 "mu_Iso": "NUM_TightRelIso_DEN_TightIDandIPCut",
             },
             "EGM": {
-                "ele_Reco 2017 Electron-ID-SF": "",
-                "ele_ID 2017 Electron-ID-SF": "wp80iso",
+                "ele_Reco 2017 UL-Electron-ID-SF": "RecoAbove20",
+                "ele_ID 2017 UL-Electron-ID-SF": "Tight",
+                "ele_Trig EGamma_SF2D": "egammaTrigEffi_wp90noiso_EGM2D_2017.root",
             },
             "muonSS": "",
             "electronSS": [
@@ -153,9 +156,9 @@ correction_config = {
             "cvmfs_override": {
                 "MUO": "Run2-2017-UL-NanoAODv9",  # Nanov15 unavailable
                 "muonSS": "Run2-2017-UL-NanoAODv9",  # Nanov15 unavailable
-                "EGM": "Run2-2017-UL-NanoAODv15",
-                "electronSS": "Run2-2017-UL-NanoAODv15",
-                "jetveto": "Run2-2017-UL-NanoAODv15",
+                "EGM": "Run2-2017-UL-NanoAODv9",
+                "electronSS": "Run2-2017-UL-NanoAODv9",
+                "jetveto": "Run2-2017-UL-NanoAODv9",
             },
         },
         "tt_semilep_mu": {
